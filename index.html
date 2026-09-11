@@ -46,55 +46,65 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .page-header h1{font-size:22px;font-weight:700;color:var(--blue);letter-spacing:-.02em;line-height:1.2}
 .page-header .sub{font-size:12px;color:var(--text-muted);margin-top:3px}
 .ph-badge{display:flex;align-items:center;gap:6px;background:var(--blue-light);border:1px solid var(--blue-mid);border-radius:6px;padding:6px 12px;font-size:11px;color:var(--blue);font-weight:600;white-space:nowrap}
-.btn-export{padding:7px 14px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-export{padding:8px 15px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:var(--radius);font-size:12px;font-weight:600;cursor:pointer;transition:background .15s}
 .btn-export:hover{background:var(--blue-mid)}
 
-select.month-select{padding:8px 12px;border:1px solid var(--border);border-radius:var(--radius);font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text);background:#fff;cursor:pointer}
-
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:22px}
-.stat-card{padding:18px}
-.stat-label{font-size:10.5px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:8px}
-.stat-value{font-size:26px;font-weight:700;color:var(--blue);font-family:'IBM Plex Mono',monospace;letter-spacing:-.02em}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px}
+.stat-card{padding:14px 16px}
+.stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:6px}
+.stat-value{font-size:21px;font-weight:700;color:var(--blue);font-family:'IBM Plex Mono',monospace;letter-spacing:-.02em}
 .stat-value.green{color:var(--green)}
 .stat-value.orange{color:var(--orange)}
-.stat-sub{font-size:11px;color:var(--text-dim);margin-top:4px}
+.stat-sub{font-size:10.5px;color:var(--text-dim);margin-top:3px}
 
-.progress-wrap{margin:4px 0 22px}
-.progress-bar{height:22px;border-radius:6px;overflow:hidden;display:flex;background:var(--gray-100);border:1px solid var(--border)}
-.progress-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:10px;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;transition:width .3s}
+.progress-wrap{margin:2px 0 18px}
+.progress-bar{height:20px;border-radius:6px;overflow:hidden;display:flex;background:var(--gray-100);border:1px solid var(--border)}
+.progress-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-family:'IBM Plex Mono',monospace;color:#fff;font-weight:600;white-space:nowrap;overflow:hidden;transition:width .3s}
 .progress-seg.completo{background:var(--green)}
 .progress-seg.parcial{background:var(--orange)}
 .progress-seg.pendiente{background:var(--gray-400)}
-.progress-legend{display:flex;gap:18px;margin-top:10px;font-size:11.5px;color:var(--text-muted)}
+.progress-legend{display:flex;gap:16px;margin-top:8px;font-size:11px;color:var(--text-muted)}
 .progress-legend span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
 .dot.completo{background:var(--green)}
 .dot.parcial{background:var(--orange)}
 .dot.pendiente{background:var(--gray-400)}
 
-.rt{width:100%;border-collapse:collapse;font-size:13px}
-.rt th{text-align:left;padding:10px 14px;background:var(--blue);color:rgba(255,255,255,.9);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:500;white-space:nowrap}
-.rt td{padding:10px 14px;border-bottom:1px solid var(--gray-100);vertical-align:middle}
-.rt tr:last-child td{border-bottom:none}
-.rt tbody tr:hover td{background:var(--blue-light)}
-.rt tbody tr:nth-child(even) td{background:var(--gray-50)}
-.rt tbody tr:nth-child(even):hover td{background:var(--blue-light)}
-.td-code{font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--text-muted);white-space:nowrap}
-.rt tbody tr.oc-row{cursor:pointer}
-.rt tbody tr.detail-row td{background:var(--gray-50);padding:0}
-.rt tbody tr.detail-row.hidden{display:none}
-.detail-inner{padding:10px 14px 14px 34px}
-.detail-inner table{width:100%;border-collapse:collapse;font-size:12px}
-.detail-inner th{text-align:left;padding:6px 10px;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;border-bottom:1px solid var(--border)}
-.detail-inner td{padding:6px 10px;border-bottom:1px solid var(--gray-100)}
-.extra-flag{color:var(--orange);font-weight:700;font-size:10px;margin-left:6px}
+/* ===== Secciones de mes (acordeón grande) ===== */
+.mes-section{margin-bottom:16px}
+.mes-header{background:var(--blue);color:#fff;padding:14px 18px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--shadow);user-select:none}
+.mes-header:hover{background:var(--blue-dark)}
+.mes-header .mes-title{display:flex;align-items:center;gap:10px;font-weight:700;font-size:15px}
+.mes-header .chevron{transition:transform .2s;font-size:11px}
+.mes-header.open .chevron{transform:rotate(90deg)}
+.mes-header .mes-stats{display:flex;gap:16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(255,255,255,.9)}
+.mes-body{display:none;padding:18px 0 4px}
+.mes-body.open{display:block}
 
-.badge{display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:11px;padding:3px 9px;border-radius:4px;font-weight:500;white-space:nowrap}
+/* ===== Acordeón de OC ===== */
+.oc-list{display:flex;flex-direction:column;gap:8px}
+.oc-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow)}
+.oc-header{padding:12px 16px;display:grid;grid-template-columns:1.3fr 1.8fr 1fr 0.9fr 1fr 1fr 0.8fr 1fr auto;gap:10px;align-items:center;cursor:pointer;font-size:12.5px}
+.oc-header:hover{background:var(--blue-light)}
+.oc-header .oc-code{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--blue)}
+.oc-header .oc-label{font-size:9.5px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:1px}
+.oc-header .oc-chevron{transition:transform .2s;color:var(--text-dim);font-size:11px;text-align:right}
+.oc-item.open .oc-chevron{transform:rotate(90deg)}
+.oc-body{display:none;border-top:1px solid var(--border);background:var(--gray-50)}
+.oc-item.open .oc-body{display:block}
+.oc-body table{width:100%;border-collapse:collapse;font-size:12px}
+.oc-body th{text-align:left;padding:8px 16px;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;border-bottom:1px solid var(--border)}
+.oc-body td{padding:7px 16px;border-bottom:1px solid var(--gray-100)}
+.extra-flag{color:var(--orange);font-weight:700;font-size:9.5px;margin-left:6px;background:var(--yellow-bg);border:1px solid #f3d29b;padding:1px 6px;border-radius:3px}
+@media (max-width:900px){
+  .oc-header{grid-template-columns:1fr 1fr;grid-template-areas:none}
+}
+
+.badge{display:inline-flex;align-items:center;gap:4px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:3px 9px;border-radius:4px;font-weight:500;white-space:nowrap}
 .badge-completo{background:var(--green-bg);color:var(--green);border:1px solid #a7d7bc}
 .badge-parcial{background:var(--orange-bg);color:var(--orange);border:1px solid #f0c4a0}
 .badge-pendiente{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200)}
-.badge-extra{background:var(--yellow-bg);color:var(--yellow);border:1px solid #f3d29b}
 
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1.5px solid var(--blue);border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-md);z-index:999;transform:translateY(100px);opacity:0;transition:transform .25s,opacity .25s;color:var(--text)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -104,7 +114,6 @@ select.month-select{padding:8px 12px;border:1px solid var(--border);border-radiu
 .btn-primary{padding:10px 18px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-weight:700;font-size:13px;letter-spacing:.02em;cursor:pointer;transition:background .15s,transform .1s,box-shadow .15s;box-shadow:0 2px 6px rgba(0,82,155,.3)}
 .btn-primary:hover{background:var(--blue-dark);transform:translateY(-1px)}
 .btn-primary:active{transform:none}
-.btn-primary:disabled{background:var(--gray-300);box-shadow:none;cursor:not-allowed;transform:none}
 .btn-del{background:var(--red);box-shadow:0 2px 6px rgba(185,28,28,.25)}
 .btn-del:hover{background:#991b1b}
 .btn-sm{padding:6px 12px;font-size:12px}
@@ -146,98 +155,31 @@ select.month-select{padding:8px 12px;border:1px solid var(--border);border-radiu
   </div>
   <div style="display:flex;align-items:center;gap:12px">
     <span id="sync-status" style="font-size:11px;color:rgba(255,255,255,0.7);font-family:'IBM Plex Mono',monospace"></span>
-    <div class="header-badge">DASHBOARD v1.0</div>
+    <div class="header-badge">DASHBOARD v2.0</div>
   </div>
 </header>
 
 <nav>
-  <button class="tab active" data-id="resumen">📊 Resumen</button>
-  <button class="tab" data-id="detalle">📋 Detalle por OC</button>
+  <button class="tab active" data-id="pedido">📋 Pedido Mensual</button>
   <button class="tab" data-id="admin">⚙️ Admin</button>
 </nav>
 
-<!-- ===================== RESUMEN ===================== -->
-<div class="page active" id="page-resumen">
+<!-- ===================== PEDIDO MENSUAL (resumen + detalle unificados) ===================== -->
+<div class="page active" id="page-pedido">
   <div class="page-header">
     <div>
-      <h1>Avance de Pedido — Laboratorio</h1>
-      <div class="sub">Seguimiento mensual: pedido solicitado vs. actas de recepción</div>
+      <h1>Pedido Mensual — Laboratorio</h1>
+      <div class="sub">Pedido solicitado vs. actas de recepción, agrupado por mes. Click en un mes o en una OC para desplegar el detalle.</div>
     </div>
-    <select class="month-select" id="mes-select-resumen"></select>
+    <button class="btn-export" id="btn-export-historico">⬇ Descargar CSV histórico</button>
   </div>
 
-  <div id="resumen-empty" class="empty-state" style="display:none">
+  <div id="pedido-empty" class="empty-state" style="display:none">
     <div class="big">📭</div>
-    <div>No hay datos cargados para este mes todavía.</div>
+    <div>No hay datos cargados todavía. Ve a la pestaña Admin para subir el primer pedido y las actas del mes.</div>
   </div>
 
-  <div id="resumen-content">
-    <div class="cards-grid">
-      <div class="card stat-card">
-        <div class="stat-label">Total pedido</div>
-        <div class="stat-value" id="stat-pedido">$0</div>
-        <div class="stat-sub" id="stat-pedido-n">0 líneas · 0 OC</div>
-      </div>
-      <div class="card stat-card">
-        <div class="stat-label">Total con acta</div>
-        <div class="stat-value green" id="stat-acta">$0</div>
-        <div class="stat-sub" id="stat-acta-pct">0% del pedido</div>
-      </div>
-      <div class="card stat-card">
-        <div class="stat-label">OC pendientes</div>
-        <div class="stat-value orange" id="stat-pendientes">0</div>
-        <div class="stat-sub" id="stat-pendientes-monto">$0 sin recepción</div>
-      </div>
-      <div class="card stat-card">
-        <div class="stat-label">Última actualización</div>
-        <div class="stat-value" style="font-size:15px" id="stat-actualizado">—</div>
-        <div class="stat-sub" id="stat-actualizado-sub">&nbsp;</div>
-      </div>
-    </div>
-
-    <div class="card" style="padding:20px;margin-bottom:22px">
-      <div style="font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:10px">Avance por monto ($)</div>
-      <div class="progress-wrap">
-        <div class="progress-bar" id="progress-bar"></div>
-        <div class="progress-legend">
-          <span><span class="dot completo"></span>Completo</span>
-          <span><span class="dot parcial"></span>Parcial</span>
-          <span><span class="dot pendiente"></span>Pendiente</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="card">
-      <table class="rt">
-        <thead><tr><th>Estado</th><th>N° OC</th><th>Monto</th><th>% del total</th></tr></thead>
-        <tbody id="resumen-estado-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ===================== DETALLE ===================== -->
-<div class="page" id="page-detalle">
-  <div class="page-header">
-    <div>
-      <h1>Detalle por Orden de Compra</h1>
-      <div class="sub">Click en una fila para ver el detalle de artículos</div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <select class="month-select" id="mes-select-detalle"></select>
-      <button class="btn-export" id="btn-export-csv">⬇ Exportar CSV</button>
-    </div>
-  </div>
-  <div id="detalle-empty" class="empty-state" style="display:none">
-    <div class="big">📭</div>
-    <div>No hay datos cargados para este mes todavía.</div>
-  </div>
-  <div class="card" id="detalle-card">
-    <table class="rt">
-      <thead><tr><th>OC</th><th>Proveedor</th><th>Fecha pedido</th><th>N° líneas</th><th>Monto pedido</th><th>Monto acta</th><th>% avance</th><th>Estado</th></tr></thead>
-      <tbody id="detalle-tbody"></tbody>
-    </table>
-  </div>
+  <div id="meses-container"></div>
 </div>
 
 <!-- ===================== ADMIN ===================== -->
@@ -311,14 +253,17 @@ const DATA_PATH = 'data.json';
 const ADMIN_PASSWORD = 'CPM2026';
 
 /* ===================== ESTADO EN MEMORIA ===================== */
-let DATA = { meses: {} };   // { meses: { "2026-09": { pedido:[...], actas:[...], actualizado: "..." } } }
+let DATA = { meses: {} };
 let DATA_SHA = null;
 let ghToken = localStorage.getItem('cl_gh_token') || '';
 let isAdmin = localStorage.getItem('cl_admin') === '1';
+let mesesAbiertos = new Set();   // qué secciones de mes están desplegadas
+let ocsAbiertas = new Set();     // qué OC (clave "mes|oc") están desplegadas
+
+const MESES_NOMBRE = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
 /* ===================== GITHUB API ===================== */
 async function ghGetPublic() {
-  // lectura pública sin token, vía raw.githubusercontent (más rápido, sin límite estricto de rate)
   const url = `https://raw.githubusercontent.com/${OWNER}/${REPO}/main/${DATA_PATH}?t=${Date.now()}`;
   const res = await fetch(url);
   if (!res.ok) return null;
@@ -365,9 +310,7 @@ async function saveData() {
     throw e;
   }
 }
-function setSync(msg) {
-  document.getElementById('sync-status').textContent = msg;
-}
+function setSync(msg) { document.getElementById('sync-status').textContent = msg; }
 
 /* ===================== TOAST ===================== */
 function showToast(msg, type) {
@@ -392,6 +335,10 @@ document.querySelectorAll('.tab').forEach(btn => {
 /* ===================== FORMATO ===================== */
 const fmtCLP = n => '$' + Math.round(n || 0).toLocaleString('es-CL');
 const fmtPct = n => (isFinite(n) ? Math.round(n * 100) : 0) + '%';
+function mesLabel(mes) {
+  const [y, m] = mes.split('-');
+  return `${MESES_NOMBRE[parseInt(m,10)-1]} ${y}`;
+}
 
 /* ===================== PARSEO EXCEL PEDIDO ===================== */
 async function parsePedidoFile(file) {
@@ -400,7 +347,6 @@ async function parsePedidoFile(file) {
   const sheetName = wb.SheetNames.find(n => n.trim().toUpperCase().startsWith('PEDIDO')) || wb.SheetNames[0];
   const sheet = wb.Sheets[sheetName];
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
-  // fila 0 = headers: Rut proveedor, Proveedor, Cod.Artículo, Artículo, cantidad, Precio, Total, OC
   const out = [];
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
@@ -425,9 +371,7 @@ async function parseActasFile(file) {
   const wb = XLSX.read(buf, { type: 'array' });
   const sheet = wb.Sheets[wb.SheetNames[0]];
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
-
   const headerRe = /ACTA:\s*FECHA:\s*(\d{2}\/\d{2}\/\d{4})\s*PER\.\s*IMPUT:\s*(\d{6})\s*ACTA:\s*(\d+)\s*PROVEEDOR:\s*(\d+)\s*-\s*(.*?)\s*NRO\.\s*OC:\s*(\S+)\s*FACTURA:\s*(\S+)/;
-
   const out = [];
   let current = null;
   for (let i = 0; i < rows.length; i++) {
@@ -435,15 +379,11 @@ async function parseActasFile(file) {
     const c0 = r && r[0] != null ? String(r[0]) : '';
     if (c0.startsWith('ACTA:')) {
       const m = headerRe.exec(c0);
-      if (m) {
-        current = {
-          fecha_acta: m[1], periodo: m[2], acta_num: m[3],
-          proveedor_cod: m[4], proveedor_nombre: m[5].trim(),
-          oc: m[6], factura: m[7]
-        };
-      } else {
-        current = null;
-      }
+      current = m ? {
+        fecha_acta: m[1], periodo: m[2], acta_num: m[3],
+        proveedor_cod: m[4], proveedor_nombre: m[5].trim(),
+        oc: m[6], factura: m[7]
+      } : null;
     } else {
       if (!current) continue;
       const cod = c0.trim();
@@ -467,14 +407,10 @@ function mesActual() {
   return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
 }
 function ensureMes(mes) {
-  if (!DATA.meses[mes]) {
-    DATA.meses[mes] = { pedido: [], actas: [], actualizado: null };
-  }
+  if (!DATA.meses[mes]) DATA.meses[mes] = { pedido: [], actas: [], actualizado: null };
   return DATA.meses[mes];
 }
-function listaMeses() {
-  return Object.keys(DATA.meses).sort().reverse();
-}
+function listaMeses() { return Object.keys(DATA.meses).sort().reverse(); }
 
 /* ===================== CÁLCULO DE AVANCE POR OC ===================== */
 function calcularAvancePorOC(mes) {
@@ -491,7 +427,7 @@ function calcularAvancePorOC(mes) {
   });
   (m.actas || []).forEach(a => {
     const oc = a.oc || '(sin OC)';
-    if (!porOC[oc]) porOC[oc] = { oc, proveedor: a.proveedor_nombre, fecha_pedido: null, extra: false, lineas: [], total_pedido: 0, total_acta: 0, actas_extra: [] };
+    if (!porOC[oc]) porOC[oc] = { oc, proveedor: a.proveedor_nombre, fecha_pedido: null, extra: false, lineas: [], total_pedido: 0, total_acta: 0 };
     porOC[oc].total_acta += a.total;
   });
   return Object.values(porOC).map(o => {
@@ -504,139 +440,148 @@ function calcularAvancePorOC(mes) {
   }).sort((a,b) => b.total_pedido - a.total_pedido);
 }
 
-/* ===================== RENDER: SELECTS DE MES ===================== */
-function renderMesSelects() {
-  const meses = listaMeses();
-  ['mes-select-resumen','mes-select-detalle'].forEach(id => {
-    const sel = document.getElementById(id);
-    const prev = sel.value;
-    sel.innerHTML = meses.length ? meses.map(m => `<option value="${m}">${m}</option>`).join('') : `<option value="">Sin datos</option>`;
-    if (meses.includes(prev)) sel.value = prev;
-  });
-}
-
-/* ===================== RENDER: RESUMEN ===================== */
-function renderResumen() {
-  const mes = document.getElementById('mes-select-resumen').value;
-  const cont = document.getElementById('resumen-content');
-  const empty = document.getElementById('resumen-empty');
-  if (!mes || !DATA.meses[mes] || (DATA.meses[mes].pedido.length === 0 && DATA.meses[mes].actas.length === 0)) {
-    cont.style.display = 'none'; empty.style.display = 'block';
-    return;
-  }
-  cont.style.display = 'block'; empty.style.display = 'none';
-
-  const ocs = calcularAvancePorOC(mes);
-  const totalPedido = ocs.reduce((s,o) => s + o.total_pedido, 0);
-  const totalActa = ocs.reduce((s,o) => s + o.total_acta, 0);
-  const nOC = ocs.length;
-  const nLineas = (DATA.meses[mes].pedido || []).length;
-
-  document.getElementById('stat-pedido').textContent = fmtCLP(totalPedido);
-  document.getElementById('stat-pedido-n').textContent = `${nLineas} líneas · ${nOC} OC`;
-  document.getElementById('stat-acta').textContent = fmtCLP(totalActa);
-  document.getElementById('stat-acta-pct').textContent = fmtPct(totalPedido ? totalActa/totalPedido : 0) + ' del pedido';
-
-  const pendientes = ocs.filter(o => o.estado === 'pendiente');
-  const montoPend = pendientes.reduce((s,o) => s + (o.total_pedido - o.total_acta), 0);
-  document.getElementById('stat-pendientes').textContent = pendientes.length;
-  document.getElementById('stat-pendientes-monto').textContent = fmtCLP(montoPend) + ' sin recepción';
-
-  const upd = DATA.meses[mes].actualizado;
-  document.getElementById('stat-actualizado').textContent = upd ? new Date(upd).toLocaleDateString('es-CL', {day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
-  document.getElementById('stat-actualizado-sub').textContent = upd ? new Date(upd).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'}) : '';
-
+/* ===================== RENDER: PEDIDO MENSUAL (agrupado por mes, acordeón) ===================== */
+function progressBarHTML(ocs) {
+  const totalPedido = ocs.reduce((s,o) => s + o.total_pedido, 0) || 1;
   const completo = ocs.filter(o=>o.estado==='completo').reduce((s,o)=>s+o.total_pedido,0);
   const parcial = ocs.filter(o=>o.estado==='parcial');
   const parcialActa = parcial.reduce((s,o)=>s+o.total_acta,0);
   const parcialPend = parcial.reduce((s,o)=>s+(o.total_pedido-o.total_acta),0);
-  const pendiente = pendientes.reduce((s,o)=>s+o.total_pedido,0);
-  const tot = totalPedido || 1;
-  const bar = document.getElementById('progress-bar');
-  bar.innerHTML = `
-    <div class="progress-seg completo" style="width:${(completo/tot*100)}%">${completo>0?fmtPct(completo/tot):''}</div>
-    <div class="progress-seg parcial" style="width:${(parcialActa/tot*100)}%">${parcialActa>0?fmtPct(parcialActa/tot):''}</div>
-    <div class="progress-seg pendiente" style="width:${((pendiente+parcialPend)/tot*100)}%">${(pendiente+parcialPend)>0?fmtPct((pendiente+parcialPend)/tot):''}</div>
-  `;
-
-  const grupos = [
-    { label: 'Completo', estado: 'completo' },
-    { label: 'Parcial', estado: 'parcial' },
-    { label: 'Pendiente', estado: 'pendiente' }
-  ];
-  document.getElementById('resumen-estado-tbody').innerHTML = grupos.map(g => {
-    const lst = ocs.filter(o => o.estado === g.estado);
-    const monto = lst.reduce((s,o)=>s+o.total_pedido,0);
-    return `<tr>
-      <td><span class="badge badge-${g.estado}">${g.label}</span></td>
-      <td>${lst.length}</td>
-      <td>${fmtCLP(monto)}</td>
-      <td>${fmtPct(tot? monto/tot : 0)}</td>
-    </tr>`;
-  }).join('');
+  const pendiente = ocs.filter(o=>o.estado==='pendiente').reduce((s,o)=>s+o.total_pedido,0);
+  return `<div class="progress-wrap">
+    <div class="progress-bar">
+      <div class="progress-seg completo" style="width:${(completo/totalPedido*100)}%">${completo>0?fmtPct(completo/totalPedido):''}</div>
+      <div class="progress-seg parcial" style="width:${(parcialActa/totalPedido*100)}%">${parcialActa>0?fmtPct(parcialActa/totalPedido):''}</div>
+      <div class="progress-seg pendiente" style="width:${((pendiente+parcialPend)/totalPedido*100)}%">${(pendiente+parcialPend)>0?fmtPct((pendiente+parcialPend)/totalPedido):''}</div>
+    </div>
+    <div class="progress-legend">
+      <span><span class="dot completo"></span>Completo</span>
+      <span><span class="dot parcial"></span>Parcial</span>
+      <span><span class="dot pendiente"></span>Pendiente</span>
+    </div>
+  </div>`;
 }
 
-/* ===================== RENDER: DETALLE ===================== */
-function renderDetalle() {
-  const mes = document.getElementById('mes-select-detalle').value;
-  const card = document.getElementById('detalle-card');
-  const empty = document.getElementById('detalle-empty');
-  if (!mes || !DATA.meses[mes] || (DATA.meses[mes].pedido.length === 0 && DATA.meses[mes].actas.length === 0)) {
-    card.style.display = 'none'; empty.style.display = 'block';
+function ocAccordionHTML(mes, o) {
+  const badgeLabel = { completo: 'Completo', parcial: 'Parcial', pendiente: 'Pendiente' };
+  const key = mes + '|' + o.oc;
+  const open = ocsAbiertas.has(key);
+  const detailRows = o.lineas.map(l => `
+    <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
+  `).join('');
+  return `
+  <div class="oc-item ${open?'open':''}" data-key="${key}">
+    <div class="oc-header" data-key="${key}">
+      <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}</div>
+      <div><span class="oc-label">Proveedor</span>${o.proveedor || '—'}</div>
+      <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '—'}</div>
+      <div><span class="oc-label">Líneas</span>${o.lineas.length}</div>
+      <div><span class="oc-label">Pedido</span>${fmtCLP(o.total_pedido)}</div>
+      <div><span class="oc-label">Acta</span>${fmtCLP(o.total_acta)}</div>
+      <div><span class="oc-label">Avance</span>${fmtPct(o.pct)}</div>
+      <div><span class="badge badge-${o.estado}">${badgeLabel[o.estado]}</span></div>
+      <div class="oc-chevron">▸</div>
+    </div>
+    <div class="oc-body">
+      <table>
+        <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
+        <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderPedidoMensual() {
+  const meses = listaMeses();
+  const cont = document.getElementById('meses-container');
+  const empty = document.getElementById('pedido-empty');
+  if (!meses.length) {
+    cont.innerHTML = ''; empty.style.display = 'block';
     return;
   }
-  card.style.display = 'block'; empty.style.display = 'none';
+  empty.style.display = 'none';
 
-  const ocs = calcularAvancePorOC(mes);
-  const badgeLabel = { completo: 'Completo', parcial: 'Parcial', pendiente: 'Pendiente' };
-  document.getElementById('detalle-tbody').innerHTML = ocs.map((o, idx) => {
-    const detailRows = o.lineas.map(l => `
-      <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
-    `).join('');
+  if (mesesAbiertos.size === 0 && meses.length) mesesAbiertos.add(meses[0]);
+
+  cont.innerHTML = meses.map(mes => {
+    const m = DATA.meses[mes];
+    const ocs = calcularAvancePorOC(mes);
+    const totalPedido = ocs.reduce((s,o) => s + o.total_pedido, 0);
+    const totalActa = ocs.reduce((s,o) => s + o.total_acta, 0);
+    const pendCount = ocs.filter(o=>o.estado==='pendiente').length;
+    const open = mesesAbiertos.has(mes);
+    const upd = m.actualizado ? new Date(m.actualizado).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+
     return `
-    <tr class="oc-row" data-idx="${idx}">
-      <td class="td-code">${o.oc}${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}</td>
-      <td>${o.proveedor || '—'}</td>
-      <td>${o.fecha_pedido || '—'}</td>
-      <td>${o.lineas.length}</td>
-      <td>${fmtCLP(o.total_pedido)}</td>
-      <td>${fmtCLP(o.total_acta)}</td>
-      <td>${fmtPct(o.pct)}</td>
-      <td><span class="badge badge-${o.estado}">${badgeLabel[o.estado]}</span></td>
-    </tr>
-    <tr class="detail-row hidden" data-idx="${idx}">
-      <td colspan="8">
-        <div class="detail-inner">
-          <table>
-            <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
-            <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
-          </table>
+    <div class="mes-section">
+      <div class="mes-header ${open?'open':''}" data-mes="${mes}">
+        <div class="mes-title"><span class="chevron">▸</span> ${mesLabel(mes)}</div>
+        <div class="mes-stats">
+          <span>Pedido ${fmtCLP(totalPedido)}</span>
+          <span>Acta ${fmtCLP(totalActa)}</span>
+          <span>Avance ${fmtPct(totalPedido?totalActa/totalPedido:0)}</span>
+          <span>${pendCount} OC pendientes</span>
+          <span>Act. ${upd}</span>
         </div>
-      </td>
-    </tr>`;
+      </div>
+      <div class="mes-body ${open?'open':''}" data-mes-body="${mes}">
+        <div class="cards-grid">
+          <div class="card stat-card">
+            <div class="stat-label">Total pedido</div>
+            <div class="stat-value">${fmtCLP(totalPedido)}</div>
+            <div class="stat-sub">${(m.pedido||[]).length} líneas · ${ocs.length} OC</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">Total con acta</div>
+            <div class="stat-value green">${fmtCLP(totalActa)}</div>
+            <div class="stat-sub">${fmtPct(totalPedido?totalActa/totalPedido:0)} del pedido</div>
+          </div>
+          <div class="card stat-card">
+            <div class="stat-label">OC pendientes</div>
+            <div class="stat-value orange">${pendCount}</div>
+            <div class="stat-sub">${fmtCLP(ocs.filter(o=>o.estado==='pendiente').reduce((s,o)=>s+o.total_pedido,0))} sin recepción</div>
+          </div>
+        </div>
+        ${progressBarHTML(ocs)}
+        <div class="oc-list">
+          ${ocs.map(o => ocAccordionHTML(mes, o)).join('')}
+        </div>
+      </div>
+    </div>`;
   }).join('');
 
-  document.querySelectorAll('.oc-row').forEach(row => {
-    row.addEventListener('click', () => {
-      const idx = row.dataset.idx;
-      const detailRow = document.querySelector(`.detail-row[data-idx="${idx}"]`);
-      detailRow.classList.toggle('hidden');
+  // listeners: colapsar/expandir mes
+  document.querySelectorAll('.mes-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const mes = h.dataset.mes;
+      if (mesesAbiertos.has(mes)) mesesAbiertos.delete(mes); else mesesAbiertos.add(mes);
+      renderPedidoMensual();
+    });
+  });
+  // listeners: colapsar/expandir OC
+  document.querySelectorAll('.oc-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const key = h.dataset.key;
+      if (ocsAbiertas.has(key)) ocsAbiertas.delete(key); else ocsAbiertas.add(key);
+      renderPedidoMensual();
     });
   });
 }
 
-document.getElementById('btn-export-csv').addEventListener('click', () => {
-  const mes = document.getElementById('mes-select-detalle').value;
-  if (!mes) return;
-  const ocs = calcularAvancePorOC(mes);
-  let csv = 'OC,Proveedor,Fecha Pedido,N Lineas,Total Pedido,Total Acta,Pct Avance,Estado\n';
-  ocs.forEach(o => {
-    csv += `${o.oc},"${o.proveedor||''}",${o.fecha_pedido||''},${o.lineas.length},${o.total_pedido},${o.total_acta},${Math.round(o.pct*100)}%,${o.estado}\n`;
+/* ===================== EXPORT CSV HISTÓRICO ===================== */
+document.getElementById('btn-export-historico').addEventListener('click', () => {
+  const meses = listaMeses();
+  if (!meses.length) { showToast('No hay datos para exportar', 'warn'); return; }
+  let csv = 'Mes,OC,Proveedor,Fecha Pedido,N Lineas,Total Pedido,Total Acta,Pct Avance,Estado,Extra\n';
+  meses.forEach(mes => {
+    calcularAvancePorOC(mes).forEach(o => {
+      csv += `${mes},${o.oc},"${o.proveedor||''}",${o.fecha_pedido||''},${o.lineas.length},${o.total_pedido},${o.total_acta},${Math.round(o.pct*100)}%,${o.estado},${o.extra?'SI':'NO'}\n`;
+    });
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = `compras_laboratorio_${mes}.csv`; a.click();
+  a.href = url; a.download = `compras_laboratorio_historico.csv`; a.click();
 });
 
 /* ===================== ADMIN: LOGIN ===================== */
@@ -652,18 +597,9 @@ document.getElementById('btn-login').addEventListener('click', () => {
   const pass = document.getElementById('admin-pass').value;
   const token = document.getElementById('admin-token').value.trim();
   const statusEl = document.getElementById('login-status');
-  if (pass !== ADMIN_PASSWORD) {
-    statusEl.textContent = 'Clave incorrecta.';
-    statusEl.className = 'status-line err';
-    return;
-  }
-  if (!token) {
-    statusEl.textContent = 'Falta el token de GitHub (necesario para guardar cambios).';
-    statusEl.className = 'status-line err';
-    return;
-  }
-  ghToken = token;
-  isAdmin = true;
+  if (pass !== ADMIN_PASSWORD) { statusEl.textContent = 'Clave incorrecta.'; statusEl.className = 'status-line err'; return; }
+  if (!token) { statusEl.textContent = 'Falta el token de GitHub (necesario para guardar cambios).'; statusEl.className = 'status-line err'; return; }
+  ghToken = token; isAdmin = true;
   localStorage.setItem('cl_gh_token', token);
   localStorage.setItem('cl_admin', '1');
   statusEl.textContent = '';
@@ -709,10 +645,9 @@ document.getElementById('btn-upload-pedido').addEventListener('click', async () 
     await saveData();
     statusEl.textContent = `${lineas.length} líneas de pedido agregadas a ${mes}.`;
     statusEl.className = 'status-line ok';
+    mesesAbiertos.add(mes);
     renderAdminResumenMes();
-    renderMesSelects();
-    renderResumen();
-    renderDetalle();
+    renderPedidoMensual();
     fileInput.value = '';
   } catch (e) {
     statusEl.textContent = 'Error: ' + e.message;
@@ -731,16 +666,15 @@ document.getElementById('btn-upload-actas').addEventListener('click', async () =
     statusEl.textContent = 'Leyendo archivo de actas…'; statusEl.className = 'status-line';
     const actas = await parseActasFile(fileInput.files[0]);
     const m = ensureMes(mes);
-    m.actas = actas; // el archivo de actas es acumulativo -> reemplaza completo
+    m.actas = actas;
     m.actualizado = new Date().toISOString();
     statusEl.textContent = 'Guardando en GitHub…';
     await saveData();
     statusEl.textContent = `${actas.length} líneas de acta cargadas para ${mes} (reemplazó el set anterior).`;
     statusEl.className = 'status-line ok';
+    mesesAbiertos.add(mes);
     renderAdminResumenMes();
-    renderMesSelects();
-    renderResumen();
-    renderDetalle();
+    renderPedidoMensual();
     fileInput.value = '';
   } catch (e) {
     statusEl.textContent = 'Error: ' + e.message;
@@ -756,9 +690,7 @@ document.getElementById('btn-clear-mes').addEventListener('click', async () => {
   delete DATA.meses[mes];
   await saveData();
   renderAdminResumenMes();
-  renderMesSelects();
-  renderResumen();
-  renderDetalle();
+  renderPedidoMensual();
   showToast(`Datos de ${mes} borrados`);
 });
 
@@ -779,19 +711,9 @@ async function init() {
     setSync('Sin conexión a GitHub');
     DATA = { meses: {} };
   }
-  renderMesSelects();
-  const meses = listaMeses();
-  if (meses.length) {
-    document.getElementById('mes-select-resumen').value = meses[0];
-    document.getElementById('mes-select-detalle').value = meses[0];
-  }
   renderAdminAuth();
-  renderResumen();
-  renderDetalle();
+  renderPedidoMensual();
 }
-document.getElementById('mes-select-resumen').addEventListener('change', renderResumen);
-document.getElementById('mes-select-detalle').addEventListener('change', renderDetalle);
-
 init();
 </script>
 </body>
