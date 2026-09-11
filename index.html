@@ -81,6 +81,20 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .mes-header .mes-stats{display:flex;gap:16px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:rgba(255,255,255,.9)}
 .mes-body{display:none;padding:18px 0 4px}
 .mes-body.open{display:block}
+/* ===== Categorías dentro de un mes (acordeón mediano) ===== */
+.cat-section{margin-bottom:10px}
+.cat-header{padding:10px 16px;border-radius:var(--radius);cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow)}
+.cat-header:hover{background:var(--gray-50)}
+.cat-header .cat-title{display:flex;align-items:center;gap:9px;font-weight:600;font-size:12.5px;color:var(--text)}
+.cat-header .cat-count{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--text-muted)}
+.cat-header .cat-chevron{transition:transform .2s;color:var(--text-dim);font-size:10px}
+.cat-header.open .cat-chevron{transform:rotate(90deg)}
+.cat-body{display:none;padding-top:8px}
+.cat-body.open{display:block}
+.cat-header.cat-completo{border-left:3px solid var(--green)}
+.cat-header.cat-parcial{border-left:3px solid var(--orange)}
+.cat-header.cat-pendiente{border-left:3px solid var(--gray-400)}
+
 
 /* ===== Acordeón de OC ===== */
 .oc-list{display:flex;flex-direction:column;gap:8px}
@@ -259,6 +273,9 @@ let ghToken = localStorage.getItem('cl_gh_token') || '';
 let isAdmin = localStorage.getItem('cl_admin') === '1';
 let mesesAbiertos = new Set();   // qué secciones de mes están desplegadas
 let ocsAbiertas = new Set();     // qué OC (clave "mes|oc") están desplegadas
+let categoriasAbiertas = new Set(); // qué categorías (clave "mes|estado") están desplegadas
+let mesesInicializados = false;     // para abrir el mes más reciente solo una vez, al cargar
+let categoriasInicializadas = false; // para abrir "parcial" por defecto solo una vez, al cargar
 
 const MESES_NOMBRE = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
 
@@ -417,6 +434,7 @@ function calcularAvancePorOC(mes) {
   const m = DATA.meses[mes];
   if (!m) return [];
   const porOC = {};
+  // El universo de OC válidas lo define SIEMPRE el archivo de pedido mensual de Laboratorio.
   (m.pedido || []).forEach(l => {
     const oc = l.oc || '(sin OC)';
     if (!porOC[oc]) porOC[oc] = { oc, proveedor: l.proveedor, fecha_pedido: l.fecha_pedido, extra: l.extra, lineas: [], total_pedido: 0, total_acta: 0 };
@@ -425,9 +443,11 @@ function calcularAvancePorOC(mes) {
     if (l.extra) porOC[oc].extra = true;
     if (l.fecha_pedido && (!porOC[oc].fecha_pedido || l.fecha_pedido < porOC[oc].fecha_pedido)) porOC[oc].fecha_pedido = l.fecha_pedido;
   });
+  // Las actas vienen de TODA la clínica (no solo Laboratorio) — solo sumamos las que
+  // correspondan a una OC que efectivamente está en el pedido de Laboratorio de este mes.
   (m.actas || []).forEach(a => {
     const oc = a.oc || '(sin OC)';
-    if (!porOC[oc]) porOC[oc] = { oc, proveedor: a.proveedor_nombre, fecha_pedido: null, extra: false, lineas: [], total_pedido: 0, total_acta: 0 };
+    if (!porOC[oc]) return; // OC de otro servicio/área -> se ignora, no se muestra
     porOC[oc].total_acta += a.total;
   });
   return Object.values(porOC).map(o => {
@@ -473,20 +493,37 @@ function ocAccordionHTML(mes, o) {
   <div class="oc-item ${open?'open':''}" data-key="${key}">
     <div class="oc-header" data-key="${key}">
       <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}</div>
-      <div><span class="oc-label">Proveedor</span>${o.proveedor || '—'}</div>
-      <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '—'}</div>
+      <div><span class="oc-label">Proveedor</span>${o.proveedor || '\u2014'}</div>
+      <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '\u2014'}</div>
       <div><span class="oc-label">Líneas</span>${o.lineas.length}</div>
       <div><span class="oc-label">Pedido</span>${fmtCLP(o.total_pedido)}</div>
       <div><span class="oc-label">Acta</span>${fmtCLP(o.total_acta)}</div>
       <div><span class="oc-label">Avance</span>${fmtPct(o.pct)}</div>
       <div><span class="badge badge-${o.estado}">${badgeLabel[o.estado]}</span></div>
-      <div class="oc-chevron">▸</div>
+      <div class="oc-chevron">\u25b8</div>
     </div>
     <div class="oc-body">
       <table>
         <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
         <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
       </table>
+    </div>
+  </div>`;
+}
+
+function categoriaAccordionHTML(mes, estado, label, dotClass, ocs) {
+  const lst = ocs.filter(o => o.estado === estado);
+  if (!lst.length) return '';
+  const key = mes + '|' + estado;
+  const open = categoriasAbiertas.has(key);
+  const monto = lst.reduce((s,o) => s + o.total_pedido, 0);
+  return `
+  <div class="cat-section">
+    <div class="cat-header cat-${estado} ${open?'open':''}" data-catkey="${key}">
+      <div class="cat-title"><span class="cat-chevron">\u25b8</span><span class="dot ${dotClass}"></span>${label} <span class="cat-count">\u00b7 ${lst.length} OC \u00b7 ${fmtCLP(monto)}</span></div>
+    </div>
+    <div class="cat-body ${open?'open':''}" data-catbody="${key}">
+      <div class="oc-list">${lst.map(o => ocAccordionHTML(mes, o)).join('')}</div>
     </div>
   </div>`;
 }
@@ -501,7 +538,10 @@ function renderPedidoMensual() {
   }
   empty.style.display = 'none';
 
-  if (mesesAbiertos.size === 0 && meses.length) mesesAbiertos.add(meses[0]);
+  if (!mesesInicializados) {
+    mesesAbiertos.add(meses[0]);
+    mesesInicializados = true;
+  }
 
   cont.innerHTML = meses.map(mes => {
     const m = DATA.meses[mes];
@@ -510,12 +550,16 @@ function renderPedidoMensual() {
     const totalActa = ocs.reduce((s,o) => s + o.total_acta, 0);
     const pendCount = ocs.filter(o=>o.estado==='pendiente').length;
     const open = mesesAbiertos.has(mes);
-    const upd = m.actualizado ? new Date(m.actualizado).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—';
+    const upd = m.actualizado ? new Date(m.actualizado).toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'}) : '\u2014';
+
+    if (!categoriasInicializadas) {
+      categoriasAbiertas.add(mes + '|parcial');
+    }
 
     return `
     <div class="mes-section">
       <div class="mes-header ${open?'open':''}" data-mes="${mes}">
-        <div class="mes-title"><span class="chevron">▸</span> ${mesLabel(mes)}</div>
+        <div class="mes-title"><span class="chevron">\u25b8</span> ${mesLabel(mes)}</div>
         <div class="mes-stats">
           <span>Pedido ${fmtCLP(totalPedido)}</span>
           <span>Acta ${fmtCLP(totalActa)}</span>
@@ -529,7 +573,7 @@ function renderPedidoMensual() {
           <div class="card stat-card">
             <div class="stat-label">Total pedido</div>
             <div class="stat-value">${fmtCLP(totalPedido)}</div>
-            <div class="stat-sub">${(m.pedido||[]).length} líneas · ${ocs.length} OC</div>
+            <div class="stat-sub">${(m.pedido||[]).length} líneas \u00b7 ${ocs.length} OC</div>
           </div>
           <div class="card stat-card">
             <div class="stat-label">Total con acta</div>
@@ -543,14 +587,15 @@ function renderPedidoMensual() {
           </div>
         </div>
         ${progressBarHTML(ocs)}
-        <div class="oc-list">
-          ${ocs.map(o => ocAccordionHTML(mes, o)).join('')}
-        </div>
+        ${categoriaAccordionHTML(mes, 'completo', 'Completo', 'completo', ocs)}
+        ${categoriaAccordionHTML(mes, 'parcial', 'Parcial', 'parcial', ocs)}
+        ${categoriaAccordionHTML(mes, 'pendiente', 'Pendiente', 'pendiente', ocs)}
       </div>
     </div>`;
   }).join('');
 
-  // listeners: colapsar/expandir mes
+  categoriasInicializadas = true;
+
   document.querySelectorAll('.mes-header').forEach(h => {
     h.addEventListener('click', () => {
       const mes = h.dataset.mes;
@@ -558,7 +603,13 @@ function renderPedidoMensual() {
       renderPedidoMensual();
     });
   });
-  // listeners: colapsar/expandir OC
+  document.querySelectorAll('.cat-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const key = h.dataset.catkey;
+      if (categoriasAbiertas.has(key)) categoriasAbiertas.delete(key); else categoriasAbiertas.add(key);
+      renderPedidoMensual();
+    });
+  });
   document.querySelectorAll('.oc-header').forEach(h => {
     h.addEventListener('click', () => {
       const key = h.dataset.key;
