@@ -449,6 +449,9 @@ function calcularAvancePorOC(mes) {
     const oc = a.oc || '(sin OC)';
     if (!porOC[oc]) return; // OC de otro servicio/área -> se ignora, no se muestra
     porOC[oc].total_acta += a.total;
+    if (!porOC[oc].facturas) porOC[oc].facturas = [];
+    const yaExiste = porOC[oc].facturas.some(f => f.factura === a.factura && f.fecha_acta === a.fecha_acta);
+    if (!yaExiste) porOC[oc].facturas.push({ factura: a.factura, fecha_acta: a.fecha_acta, acta_num: a.acta_num });
   });
   return Object.values(porOC).map(o => {
     let estado = 'pendiente';
@@ -489,6 +492,12 @@ function ocAccordionHTML(mes, o) {
   const detailRows = o.lineas.map(l => `
     <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
   `).join('');
+  const facturas = o.facturas || [];
+  const facturasHTML = facturas.length ? `
+    <div style="padding:10px 16px 0;font-size:11.5px;color:var(--text-muted)">
+      <b>Factura(s) / guía(s):</b>
+      ${facturas.map(f => `<span class="badge badge-completo" style="margin:2px 4px 2px 0">${f.factura} · ${f.fecha_acta}</span>`).join('')}
+    </div>` : '';
   return `
   <div class="oc-item ${open?'open':''}" data-key="${key}">
     <div class="oc-header" data-key="${key}">
@@ -503,6 +512,7 @@ function ocAccordionHTML(mes, o) {
       <div class="oc-chevron">\u25b8</div>
     </div>
     <div class="oc-body">
+      ${facturasHTML}
       <table>
         <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
         <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
@@ -623,10 +633,11 @@ function renderPedidoMensual() {
 document.getElementById('btn-export-historico').addEventListener('click', () => {
   const meses = listaMeses();
   if (!meses.length) { showToast('No hay datos para exportar', 'warn'); return; }
-  let csv = 'Mes,OC,Proveedor,Fecha Pedido,N Lineas,Total Pedido,Total Acta,Pct Avance,Estado,Extra\n';
+  let csv = 'Mes,OC,Proveedor,Fecha Pedido,N Lineas,Total Pedido,Total Acta,Pct Avance,Estado,Extra,Facturas\n';
   meses.forEach(mes => {
     calcularAvancePorOC(mes).forEach(o => {
-      csv += `${mes},${o.oc},"${o.proveedor||''}",${o.fecha_pedido||''},${o.lineas.length},${o.total_pedido},${o.total_acta},${Math.round(o.pct*100)}%,${o.estado},${o.extra?'SI':'NO'}\n`;
+      const facturasStr = (o.facturas||[]).map(f => `${f.factura} (${f.fecha_acta})`).join(' | ');
+      csv += `${mes},${o.oc},"${o.proveedor||''}",${o.fecha_pedido||''},${o.lineas.length},${o.total_pedido},${o.total_acta},${Math.round(o.pct*100)}%,${o.estado},${o.extra?'SI':'NO'},"${facturasStr}"\n`;
     });
   });
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
