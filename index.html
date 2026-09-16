@@ -659,7 +659,7 @@ function renderAdminAuth() {
     renderAdminResumenMes();
   }
 }
-document.getElementById('btn-login').addEventListener('click', () => {
+document.getElementById('btn-login').addEventListener('click', async () => {
   const pass = document.getElementById('admin-pass').value;
   const token = document.getElementById('admin-token').value.trim();
   const statusEl = document.getElementById('login-status');
@@ -668,9 +668,22 @@ document.getElementById('btn-login').addEventListener('click', () => {
   ghToken = token; isAdmin = true;
   localStorage.setItem('cl_gh_token', token);
   localStorage.setItem('cl_admin', '1');
-  statusEl.textContent = '';
-  renderAdminAuth();
-  showToast('Sesión de administrador iniciada');
+  statusEl.textContent = 'Verificando acceso…';
+  statusEl.className = 'status-line';
+  try {
+    const r = await ghGetWithSha();
+    DATA = r.json && r.json.meses ? r.json : { meses: {} };
+    DATA_SHA = r.sha;
+    statusEl.textContent = '';
+    renderAdminAuth();
+    renderPedidoMensual();
+    showToast('Sesión de administrador iniciada');
+  } catch (e) {
+    statusEl.textContent = 'Clave correcta, pero el token falló: ' + e.message;
+    statusEl.className = 'status-line err';
+    isAdmin = false;
+    localStorage.removeItem('cl_admin');
+  }
 });
 document.getElementById('btn-logout').addEventListener('click', () => {
   isAdmin = false;
