@@ -1585,6 +1585,18 @@
           "oc": "11071450",
           "fecha_pedido": null,
           "extra": false
+        },
+        {
+          "rut": "79.568.850-1",
+          "proveedor": "VALTEK S.A.",
+          "codigo": "3555399",
+          "articulo": "WASH BUFFER 1X10 LT. (105-004552-00)",
+          "cantidad": 15,
+          "precio": 31124,
+          "total": 466860,
+          "oc": "11071620",
+          "fecha_pedido": "2026-09-15",
+          "extra": true
         }
       ],
       "actas": [
@@ -6055,7 +6067,7 @@
           "total": 72500
         }
       ],
-      "actualizado": "2026-09-11T18:14:42.336Z"
+      "actualizado": "2026-09-16T14:02:28.412Z"
     }
   }
 }
