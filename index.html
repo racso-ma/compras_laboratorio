@@ -127,6 +127,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .badge-parcial{background:var(--orange-bg);color:var(--orange);border:1px solid #f0c4a0}
 .badge-pendiente{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200)}
 .badge-cerrada{background:var(--red-bg);color:var(--red);border:1px solid #f3b8b8}
+.badge-gd{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid)}
 
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1.5px solid var(--blue);border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-md);z-index:999;transform:translateY(100px);opacity:0;transition:transform .25s,opacity .25s;color:var(--text)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -610,18 +611,18 @@ function ocAccordionHTML(mes, o) {
   `).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
-    if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura} · ${f.fecha_acta}`, falta: false };
+    if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura} · ${f.fecha_acta}`, clase: 'badge-completo' };
     const gd = (DATA.guias_despacho || {})[f.acta_num];
-    if (gd) return { texto: `GD ${gd.numero} · ${f.fecha_acta}`, falta: false };
-    return { texto: `⚠ Falta N° de guía · ${f.fecha_acta}`, falta: true };
+    if (gd) return { texto: `GD ${gd.numero} · ${f.fecha_acta}`, clase: 'badge-gd' };
+    return { texto: `⚠ Falta N° de guía · ${f.fecha_acta}`, clase: 'badge-parcial' };
   };
   const facturasInlineHTML = facturas.length
-    ? facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.falta?'badge-parcial':'badge-completo'}" style="margin:3px 3px 0 0">${l.texto}</span>`; }).join('')
+    ? facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.clase}" style="margin:3px 3px 0 0">${l.texto}</span>`; }).join('')
     : '<span style="color:var(--text-dim);font-size:11px">\u2014</span>';
   const facturasHTML = facturas.length ? `
     <div style="padding:10px 16px 0;font-size:11.5px;color:var(--text-muted)">
       <b>Factura(s) / guía(s):</b>
-      ${facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.falta?'badge-parcial':'badge-completo'}" style="margin:2px 4px 2px 0">${l.texto}</span>`; }).join('')}
+      ${facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.clase}" style="margin:2px 4px 2px 0">${l.texto}</span>`; }).join('')}
     </div>` : '';
   const { comoNueva, comoAntigua } = vinculosDe(o.oc);
   const cierreHTML = o.cierre ? `
