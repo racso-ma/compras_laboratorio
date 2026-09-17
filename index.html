@@ -70,6 +70,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .dot.completo{background:var(--green)}
 .dot.parcial{background:var(--orange)}
 .dot.pendiente{background:var(--gray-400)}
+.dot.cerrada{background:var(--red)}
 
 /* ===== Secciones de mes (acordeón grande) ===== */
 .mes-section{margin-bottom:16px}
@@ -94,6 +95,8 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .cat-header.cat-completo{border-left:3px solid var(--green)}
 .cat-header.cat-parcial{border-left:3px solid var(--orange)}
 .cat-header.cat-pendiente{border-left:3px solid var(--gray-400)}
+.cat-header.cat-cerrada{border-left:3px solid var(--red)}
+.ajuste-note{font-size:10.5px;color:var(--orange);background:var(--orange-bg);border:1px solid #f0c4a0;border-radius:4px;padding:1px 6px;margin-left:6px;font-family:'IBM Plex Mono',monospace}
 
 
 /* ===== Acordeón de OC ===== */
@@ -111,6 +114,10 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .oc-body th{text-align:left;padding:8px 16px;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;border-bottom:1px solid var(--border)}
 .oc-body td{padding:7px 16px;border-bottom:1px solid var(--gray-100)}
 .extra-flag{color:var(--orange);font-weight:700;font-size:9.5px;margin-left:6px;background:var(--yellow-bg);border:1px solid #f3d29b;padding:1px 6px;border-radius:3px}
+.vinculo-badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:4px;padding:2px 8px;font-size:10.5px;font-family:'IBM Plex Mono',monospace;font-weight:600;margin:3px 4px 0 0;cursor:default}
+.vinculo-list-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;margin-bottom:6px;background:var(--gray-50)}
+.vinculo-del{color:var(--red);cursor:pointer;font-weight:700;font-size:14px;padding:0 4px}
+
 @media (max-width:900px){
   .oc-header{grid-template-columns:1fr 1fr;grid-template-areas:none}
 }
@@ -119,6 +126,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .badge-completo{background:var(--green-bg);color:var(--green);border:1px solid #a7d7bc}
 .badge-parcial{background:var(--orange-bg);color:var(--orange);border:1px solid #f0c4a0}
 .badge-pendiente{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200)}
+.badge-cerrada{background:var(--red-bg);color:var(--red);border:1px solid #f3b8b8}
 
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1.5px solid var(--blue);border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-md);z-index:999;transform:translateY(100px);opacity:0;transition:transform .25s,opacity .25s;color:var(--text)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -245,6 +253,44 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
         <div class="field"><label>Archivo de actas</label><input type="file" id="actas-file" accept=".xls,.xlsx"></div>
         <button class="btn-primary btn-sm" id="btn-upload-actas">Cargar actas</button>
       </div>
+    </div>
+
+    <div class="admin-box card" style="margin-bottom:16px">
+      <h3>Guías de despacho pendientes de registrar</h3>
+      <div class="hint">El archivo de actas no trae el número real de guía cuando aún no hay factura (aparece como "FACTURA: 0"). Complétalo aquí manualmente para que quede identificado en vez de mostrar un genérico.</div>
+      <div id="gd-pendientes-list"></div>
+    </div>
+
+    <div class="admin-box card" style="margin-bottom:16px">
+      <h3>3) Regularización de pedido (Excel)</h3>
+      <div class="hint">Planilla de ajustes/cierres (columnas Proveedor, Codigo, DESCRIPCION, UDC, Precio, OC, FACTURA, Motivo — y opcionalmente "OC NUEVA" para OC cerradas). Solo se aplican filas cuyo código+OC ya existan en algún pedido cargado; el resto se ignora automáticamente (no es de Laboratorio).</div>
+      <div class="field"><label>Archivo de regularización</label><input type="file" id="regularizacion-file" accept=".xlsx,.xls"></div>
+      <button class="btn-primary btn-sm" id="btn-upload-regularizacion">Procesar regularización</button>
+      <div class="status-line" id="regularizacion-status"></div>
+    </div>
+
+    <div class="admin-box card" style="margin-bottom:16px">
+      <h3>4) Vincular OC manualmente</h3>
+      <div class="hint">Cuando una OC nueva reemplaza/regulariza a una antigua (por diferencia de precio, cantidad, etc.), vincúlalas aquí. No se suman los montos — solo queda la referencia cruzada visible en ambas OC.</div>
+      <div class="admin-grid" style="margin-bottom:10px">
+        <div>
+          <div class="field"><label>OC nueva</label><input type="text" id="vinc-nueva" placeholder="Ej: 11071305"></div>
+          <div class="field"><label>OC antigua (que regulariza)</label><input type="text" id="vinc-antigua" placeholder="Ej: 11071262"></div>
+        </div>
+        <div>
+          <div class="field"><label>Motivo</label>
+            <select id="vinc-motivo" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12.5px">
+              <option value="precio">Diferencia de precio</option>
+              <option value="cantidad">Diferencia de cantidad</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+          <div class="field"><label>Diferencia $ (opcional)</label><input type="text" id="vinc-diferencia" placeholder="Ej: 30806"></div>
+        </div>
+      </div>
+      <div class="field"><label>Nota (opcional)</label><input type="text" id="vinc-nota" placeholder="Ej: precio subió de $481.999 a $512.805"></div>
+      <button class="btn-primary btn-sm" id="btn-vincular">Vincular OC</button>
+      <div id="vinculos-list" style="margin-top:14px"></div>
     </div>
 
     <div class="admin-box card" style="margin-bottom:16px">
@@ -418,6 +464,52 @@ async function parseActasFile(file) {
   return out;
 }
 
+/* ===================== PARSEO REGULARIZACIÓN ===================== */
+async function parseRegularizacionFile(file) {
+  const buf = await file.arrayBuffer();
+  const wb = XLSX.read(buf, { type: 'array' });
+  const sheet = wb.Sheets[wb.SheetNames[0]];
+  const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+  if (!rows.length) return [];
+  const headers = rows[0].map(h => (h == null ? '' : String(h)).trim().toUpperCase());
+  const idx = (names) => headers.findIndex(h => names.some(n => h === n || h.includes(n)));
+  const iProv = idx(['PROVEEDOR']);
+  const iCod = idx(['CODIGO', 'CÓDIGO']);
+  const iDesc = idx(['DESCRIPCION', 'DESCRIPCIÓN']);
+  const iCant = idx(['UDC', 'CANTIDAD']);
+  const iPrecio = idx(['PRECIO']);
+  const iOC = idx(['OC']);
+  const iFactura = idx(['FACTURA']);
+  const iMotivo = idx(['MOTIVO']);
+  const iOCNueva = idx(['OC NUEVA', 'NUEVA OC', 'OC REEMPLAZO']);
+
+  const out = [];
+  for (let i = 1; i < rows.length; i++) {
+    const r = rows[i];
+    if (!r || r[iOC] == null || r[iOC] === '') continue;
+    out.push({
+      proveedor: iProv >= 0 && r[iProv] != null ? String(r[iProv]) : '',
+      codigo: iCod >= 0 ? String(r[iCod]) : '',
+      descripcion: iDesc >= 0 && r[iDesc] != null ? String(r[iDesc]) : '',
+      cantidad: iCant >= 0 ? Number(r[iCant]) || 0 : 0,
+      precio: iPrecio >= 0 ? Number(r[iPrecio]) || 0 : 0,
+      oc: String(r[iOC]),
+      referencia: iFactura >= 0 && r[iFactura] != null ? String(r[iFactura]) : '',
+      motivo: (iMotivo >= 0 && r[iMotivo] != null ? String(r[iMotivo]) : '').trim(),
+      oc_nueva: iOCNueva >= 0 && r[iOCNueva] != null ? String(r[iOCNueva]).trim() : ''
+    });
+  }
+  return out;
+}
+function buscarLineaPedido(oc, codigo) {
+  for (const mes of Object.keys(DATA.meses)) {
+    const m = DATA.meses[mes];
+    const linea = (m.pedido || []).find(l => l.oc === oc && l.codigo === codigo);
+    if (linea) return { mes, linea };
+  }
+  return null;
+}
+
 /* ===================== HELPERS DE MES ===================== */
 function mesActual() {
   const d = new Date();
@@ -428,6 +520,23 @@ function ensureMes(mes) {
   return DATA.meses[mes];
 }
 function listaMeses() { return Object.keys(DATA.meses).sort().reverse(); }
+
+function buscarOCGlobal(ocNum) {
+  for (const mes of listaMeses()) {
+    const ocs = calcularAvancePorOC(mes);
+    const found = ocs.find(o => o.oc === ocNum);
+    if (found) return { mes, oc: found };
+  }
+  return null;
+}
+function vinculosDe(ocNum) {
+  const vs = DATA.vinculos || [];
+  return {
+    comoNueva: vs.filter(v => v.oc_nueva === ocNum),
+    comoAntigua: vs.filter(v => v.oc_antigua === ocNum)
+  };
+}
+const MOTIVO_LABEL = { precio: 'Diferencia de precio', cantidad: 'Diferencia de cantidad', otro: 'Otro motivo' };
 
 /* ===================== CÁLCULO DE AVANCE POR OC ===================== */
 function calcularAvancePorOC(mes) {
@@ -457,8 +566,11 @@ function calcularAvancePorOC(mes) {
     let estado = 'pendiente';
     if (o.total_acta > 0 && o.total_acta >= o.total_pedido * 0.98) estado = 'completo';
     else if (o.total_acta > 0) estado = 'parcial';
+    const cierre = (DATA.oc_cerradas || {})[o.oc];
+    if (cierre) { estado = 'cerrada'; o.cierre = cierre; }
     o.estado = estado;
     o.pct = o.total_pedido > 0 ? o.total_acta / o.total_pedido : (o.total_acta > 0 ? 1 : 0);
+    o.tieneAjustes = o.lineas.some(l => l.ajustado);
     return o;
   }).sort((a,b) => b.total_pedido - a.total_pedido);
 }
@@ -471,40 +583,66 @@ function progressBarHTML(ocs) {
   const parcialActa = parcial.reduce((s,o)=>s+o.total_acta,0);
   const parcialPend = parcial.reduce((s,o)=>s+(o.total_pedido-o.total_acta),0);
   const pendiente = ocs.filter(o=>o.estado==='pendiente').reduce((s,o)=>s+o.total_pedido,0);
+  const cerrada = ocs.filter(o=>o.estado==='cerrada').reduce((s,o)=>s+o.total_pedido,0);
+  const hayCerradas = cerrada > 0;
   return `<div class="progress-wrap">
     <div class="progress-bar">
       <div class="progress-seg completo" style="width:${(completo/totalPedido*100)}%">${completo>0?fmtPct(completo/totalPedido):''}</div>
       <div class="progress-seg parcial" style="width:${(parcialActa/totalPedido*100)}%">${parcialActa>0?fmtPct(parcialActa/totalPedido):''}</div>
+      ${hayCerradas ? `<div class="progress-seg" style="width:${(cerrada/totalPedido*100)}%;background:var(--red)">${fmtPct(cerrada/totalPedido)}</div>` : ''}
       <div class="progress-seg pendiente" style="width:${((pendiente+parcialPend)/totalPedido*100)}%">${(pendiente+parcialPend)>0?fmtPct((pendiente+parcialPend)/totalPedido):''}</div>
     </div>
     <div class="progress-legend">
       <span><span class="dot completo"></span>Completo</span>
       <span><span class="dot parcial"></span>Parcial</span>
+      ${hayCerradas ? '<span><span class="dot cerrada"></span>Cerrada</span>' : ''}
       <span><span class="dot pendiente"></span>Pendiente</span>
     </div>
   </div>`;
 }
 
 function ocAccordionHTML(mes, o) {
-  const badgeLabel = { completo: 'Completo', parcial: 'Parcial', pendiente: 'Pendiente' };
+  const badgeLabel = { completo: 'Completo', parcial: 'Parcial', pendiente: 'Pendiente', cerrada: 'Cerrada' };
   const key = mes + '|' + o.oc;
   const open = ocsAbiertas.has(key);
   const detailRows = o.lineas.map(l => `
-    <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
+    <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
   `).join('');
   const facturas = o.facturas || [];
+  const facturaLabel = f => {
+    if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura} · ${f.fecha_acta}`, falta: false };
+    const gd = (DATA.guias_despacho || {})[f.acta_num];
+    if (gd) return { texto: `GD ${gd.numero} · ${f.fecha_acta}`, falta: false };
+    return { texto: `⚠ Falta N° de guía · ${f.fecha_acta}`, falta: true };
+  };
   const facturasInlineHTML = facturas.length
-    ? facturas.map(f => `<span class="badge badge-completo" style="margin:3px 3px 0 0">${f.factura} · ${f.fecha_acta}</span>`).join('')
+    ? facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.falta?'badge-parcial':'badge-completo'}" style="margin:3px 3px 0 0">${l.texto}</span>`; }).join('')
     : '<span style="color:var(--text-dim);font-size:11px">\u2014</span>';
   const facturasHTML = facturas.length ? `
     <div style="padding:10px 16px 0;font-size:11.5px;color:var(--text-muted)">
       <b>Factura(s) / guía(s):</b>
-      ${facturas.map(f => `<span class="badge badge-completo" style="margin:2px 4px 2px 0">${f.factura} · ${f.fecha_acta}</span>`).join('')}
+      ${facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.falta?'badge-parcial':'badge-completo'}" style="margin:2px 4px 2px 0">${l.texto}</span>`; }).join('')}
+    </div>` : '';
+  const { comoNueva, comoAntigua } = vinculosDe(o.oc);
+  const cierreHTML = o.cierre ? `
+    <div style="padding:10px 16px 0;font-size:11.5px;color:var(--red)">
+      <b>⛔ OC cerrada</b>${o.cierre.referencia ? ' · ref. '+o.cierre.referencia : ''}${o.cierre.fecha ? ' · '+o.cierre.fecha : ''}
+    </div>` : '';
+  const ajustesHTML = o.tieneAjustes ? `
+    <div style="padding:10px 16px 0;font-size:11.5px;color:var(--orange)">
+      <b>✏️ Pedido corregido</b> en ${o.lineas.filter(l=>l.ajustado).length} línea(s) tras regularización (ver detalle abajo)
+    </div>` : '';
+  const vinculosHTML = (comoNueva.length + comoAntigua.length) ? `
+    <div style="padding:10px 16px 0;font-size:11.5px;color:var(--text-muted)">
+      <b>Vínculos:</b><br>
+      ${comoNueva.map(v => `<span class="vinculo-badge">🔗 Regulariza OC ${v.oc_antigua} · ${MOTIVO_LABEL[v.motivo]||v.motivo}${v.diferencia?' · $'+Number(v.diferencia).toLocaleString('es-CL'):''}</span>`).join('')}
+      ${comoAntigua.map(v => `<span class="vinculo-badge">🔗 Regularizada por OC ${v.oc_nueva} · ${MOTIVO_LABEL[v.motivo]||v.motivo}${v.diferencia?' · $'+Number(v.diferencia).toLocaleString('es-CL'):''}</span>`).join('')}
+      ${[...comoNueva, ...comoAntigua].filter(v=>v.nota).map(v => `<div style="margin-top:4px;font-style:italic">\u201c${v.nota}\u201d</div>`).join('')}
     </div>` : '';
   return `
   <div class="oc-item ${open?'open':''}" data-key="${key}">
     <div class="oc-header" data-key="${key}">
-      <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}</div>
+      <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}${(comoNueva.length+comoAntigua.length) ? '<span class="extra-flag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">🔗</span>' : ''}</div>
       <div><span class="oc-label">Proveedor</span>${o.proveedor || '\u2014'}</div>
       <div><span class="oc-label">Factura / guía</span>${facturasInlineHTML}</div>
       <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '\u2014'}</div>
@@ -516,7 +654,10 @@ function ocAccordionHTML(mes, o) {
       <div class="oc-chevron">\u25b8</div>
     </div>
     <div class="oc-body">
+      ${cierreHTML}
+      ${ajustesHTML}
       ${facturasHTML}
+      ${vinculosHTML}
       <table>
         <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
         <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
@@ -603,6 +744,7 @@ function renderPedidoMensual() {
         ${progressBarHTML(ocs)}
         ${categoriaAccordionHTML(mes, 'completo', 'Completo', 'completo', ocs)}
         ${categoriaAccordionHTML(mes, 'parcial', 'Parcial', 'parcial', ocs)}
+        ${categoriaAccordionHTML(mes, 'cerrada', 'Cerrada', 'cerrada', ocs)}
         ${categoriaAccordionHTML(mes, 'pendiente', 'Pendiente', 'pendiente', ocs)}
       </div>
     </div>`;
@@ -657,6 +799,8 @@ function renderAdminAuth() {
   if (isAdmin) {
     document.getElementById('admin-mes').value = document.getElementById('admin-mes').value || mesActual();
     renderAdminResumenMes();
+    renderVinculosList();
+    renderGuiasPendientes();
   }
 }
 document.getElementById('btn-login').addEventListener('click', async () => {
@@ -753,8 +897,160 @@ document.getElementById('btn-upload-actas').addEventListener('click', async () =
     statusEl.className = 'status-line ok';
     mesesAbiertos.add(mes);
     renderAdminResumenMes();
+    renderGuiasPendientes();
     renderPedidoMensual();
     fileInput.value = '';
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.className = 'status-line err';
+  }
+});
+
+/* ===================== ADMIN: GUÍAS DE DESPACHO PENDIENTES ===================== */
+function getGuiasPendientes() {
+  const pendientes = {};
+  Object.keys(DATA.meses).forEach(mes => {
+    (DATA.meses[mes].actas || []).forEach(a => {
+      if ((a.factura && a.factura !== '0') ) return;
+      if ((DATA.guias_despacho || {})[a.acta_num]) return;
+      if (!pendientes[a.acta_num]) {
+        pendientes[a.acta_num] = { acta_num: a.acta_num, oc: a.oc, proveedor: a.proveedor_nombre, fecha_acta: a.fecha_acta, mes };
+      }
+    });
+  });
+  return Object.values(pendientes).sort((a,b) => a.fecha_acta.localeCompare(b.fecha_acta));
+}
+function renderGuiasPendientes() {
+  const cont = document.getElementById('gd-pendientes-list');
+  if (!cont) return;
+  const pend = getGuiasPendientes();
+  if (!pend.length) { cont.innerHTML = '<div class="hint">Sin guías pendientes de registrar. 🎉</div>'; return; }
+  cont.innerHTML = pend.map(p => `
+    <div class="vinculo-list-item" style="align-items:center">
+      <span>Acta ${p.acta_num} · OC ${p.oc} · ${p.proveedor || '\u2014'} · ${p.fecha_acta}</span>
+      <span style="display:flex;gap:6px;align-items:center">
+        <input type="text" class="gd-input" data-acta="${p.acta_num}" placeholder="N° de guía" style="width:120px;padding:5px 8px;border:1px solid var(--border);border-radius:4px;font-size:12px">
+        <button class="btn-primary btn-sm gd-save" data-acta="${p.acta_num}">Guardar</button>
+      </span>
+    </div>
+  `).join('');
+  document.querySelectorAll('.gd-save').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const acta = btn.dataset.acta;
+      const input = document.querySelector(`.gd-input[data-acta="${acta}"]`);
+      const numero = input.value.trim();
+      if (!numero) { showToast('Ingresa el número de guía', 'warn'); return; }
+      if (!DATA.guias_despacho) DATA.guias_despacho = {};
+      DATA.guias_despacho[acta] = { numero, fecha_registro: new Date().toISOString() };
+      try {
+        await saveData();
+        renderGuiasPendientes();
+        renderPedidoMensual();
+      } catch (e) { /* saveData ya muestra el toast de error */ }
+    });
+  });
+}
+
+/* ===================== ADMIN: CARGA DE REGULARIZACIÓN ===================== */
+document.getElementById('btn-upload-regularizacion').addEventListener('click', async () => {
+  const fileInput = document.getElementById('regularizacion-file');
+  const statusEl = document.getElementById('regularizacion-status');
+  if (!fileInput.files[0]) { showToast('Selecciona un archivo de regularización', 'warn'); return; }
+  try {
+    statusEl.textContent = 'Leyendo archivo…'; statusEl.className = 'status-line';
+    const filas = await parseRegularizacionFile(fileInput.files[0]);
+    let nAjustes = 0, nCierres = 0, nVinculos = 0, nOmitidas = 0;
+    if (!DATA.oc_cerradas) DATA.oc_cerradas = {};
+    if (!DATA.vinculos) DATA.vinculos = [];
+
+    filas.forEach(f => {
+      const motivoUp = (f.motivo || '').toUpperCase();
+      if (motivoUp.includes('CERRADA')) {
+        // Cierre de OC — se aplica sin necesidad de que exista línea de pedido para ese código puntual,
+        // basta con que la OC exista en algún pedido cargado.
+        const existeOC = Object.keys(DATA.meses).some(mes => (DATA.meses[mes].pedido||[]).some(l => l.oc === f.oc));
+        if (!existeOC) { nOmitidas++; return; }
+        DATA.oc_cerradas[f.oc] = { fecha: new Date().toISOString().slice(0,10), referencia: f.referencia || null };
+        nCierres++;
+        if (f.oc_nueva) {
+          const yaExiste = DATA.vinculos.some(v => v.oc_nueva === f.oc_nueva && v.oc_antigua === f.oc);
+          if (!yaExiste) {
+            DATA.vinculos.push({ oc_nueva: f.oc_nueva, oc_antigua: f.oc, motivo: 'otro', diferencia: null, nota: 'OC cerrada y reemplazada (regularización)', fecha_registro: new Date().toISOString() });
+            nVinculos++;
+          }
+        }
+      } else if (motivoUp.includes('AJUSTE')) {
+        const encontrada = buscarLineaPedido(f.oc, f.codigo);
+        if (!encontrada) { nOmitidas++; return; }
+        const l = encontrada.linea;
+        l.cantidad = f.cantidad || l.cantidad;
+        l.precio = f.precio || l.precio;
+        l.total = l.cantidad * l.precio;
+        l.ajustado = true;
+        l.ajuste_motivo = f.motivo;
+        l.ajuste_fecha = new Date().toISOString().slice(0,10);
+        DATA.meses[encontrada.mes].actualizado = new Date().toISOString();
+        nAjustes++;
+      } else {
+        nOmitidas++;
+      }
+    });
+
+    statusEl.textContent = 'Guardando en GitHub…';
+    await saveData();
+    statusEl.textContent = `${nAjustes} línea(s) de pedido ajustadas, ${nCierres} OC cerradas (${nVinculos} con OC de reemplazo vinculada), ${nOmitidas} fila(s) omitidas (no pertenecen a Laboratorio o motivo no reconocido).`;
+    statusEl.className = 'status-line ok';
+    renderVinculosList();
+    renderPedidoMensual();
+    fileInput.value = '';
+  } catch (e) {
+    statusEl.textContent = 'Error: ' + e.message;
+    statusEl.className = 'status-line err';
+  }
+});
+
+/* ===================== ADMIN: VINCULAR OC (REGULARIZACIÓN) ===================== */
+function renderVinculosList() {
+  const cont = document.getElementById('vinculos-list');
+  const vs = DATA.vinculos || [];
+  if (!vs.length) { cont.innerHTML = '<div class="hint">Sin vínculos registrados aún.</div>'; return; }
+  cont.innerHTML = vs.map((v, idx) => `
+    <div class="vinculo-list-item">
+      <span>🔗 OC <b>${v.oc_nueva}</b> regulariza a OC <b>${v.oc_antigua}</b> — ${MOTIVO_LABEL[v.motivo]||v.motivo}${v.diferencia?' · $'+Number(v.diferencia).toLocaleString('es-CL'):''}${v.nota?' — "'+v.nota+'"':''}</span>
+      <span class="vinculo-del" data-idx="${idx}" title="Eliminar vínculo">✕</span>
+    </div>
+  `).join('');
+  document.querySelectorAll('.vinculo-del').forEach(el => {
+    el.addEventListener('click', async () => {
+      const idx = Number(el.dataset.idx);
+      DATA.vinculos.splice(idx, 1);
+      await saveData();
+      renderVinculosList();
+      renderPedidoMensual();
+    });
+  });
+}
+document.getElementById('btn-vincular').addEventListener('click', async () => {
+  const ocNueva = document.getElementById('vinc-nueva').value.trim();
+  const ocAntigua = document.getElementById('vinc-antigua').value.trim();
+  const motivo = document.getElementById('vinc-motivo').value;
+  const diferencia = document.getElementById('vinc-diferencia').value.trim();
+  const nota = document.getElementById('vinc-nota').value.trim();
+  const statusEl = document.getElementById('admin-status');
+  if (!ocNueva || !ocAntigua) { showToast('Indica ambas OC (nueva y antigua)', 'warn'); return; }
+  if (!DATA.vinculos) DATA.vinculos = [];
+  DATA.vinculos.push({ oc_nueva: ocNueva, oc_antigua: ocAntigua, motivo, diferencia: diferencia || null, nota: nota || null, fecha_registro: new Date().toISOString() });
+  try {
+    statusEl.textContent = 'Guardando vínculo…'; statusEl.className = 'status-line';
+    await saveData();
+    statusEl.textContent = `OC ${ocNueva} vinculada con OC ${ocAntigua}.`;
+    statusEl.className = 'status-line ok';
+    document.getElementById('vinc-nueva').value = '';
+    document.getElementById('vinc-antigua').value = '';
+    document.getElementById('vinc-diferencia').value = '';
+    document.getElementById('vinc-nota').value = '';
+    renderVinculosList();
+    renderPedidoMensual();
   } catch (e) {
     statusEl.textContent = 'Error: ' + e.message;
     statusEl.className = 'status-line err';
