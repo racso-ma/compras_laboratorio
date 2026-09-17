@@ -910,7 +910,11 @@ document.getElementById('btn-upload-actas').addEventListener('click', async () =
 function getGuiasPendientes() {
   const pendientes = {};
   Object.keys(DATA.meses).forEach(mes => {
+    // Universo de OC válidas = las que están en el pedido de Laboratorio de ese mes (mismo criterio que calcularAvancePorOC)
+    const ocsLab = new Set((DATA.meses[mes].pedido || []).map(l => l.oc || '(sin OC)'));
     (DATA.meses[mes].actas || []).forEach(a => {
+      const oc = a.oc || '(sin OC)';
+      if (!ocsLab.has(oc)) return; // OC de otro servicio -> se ignora
       if ((a.factura && a.factura !== '0') ) return;
       if ((DATA.guias_despacho || {})[a.acta_num]) return;
       if (!pendientes[a.acta_num]) {
