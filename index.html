@@ -113,6 +113,8 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .oc-body table{width:100%;border-collapse:collapse;font-size:12px}
 .oc-body th{text-align:left;padding:8px 16px;color:var(--text-dim);font-size:10px;text-transform:uppercase;letter-spacing:.04em;font-weight:600;border-bottom:1px solid var(--border)}
 .oc-body td{padding:7px 16px;border-bottom:1px solid var(--gray-100)}
+.oc-body tr.linea-recibida td{background:var(--green-bg)}
+.oc-body tr.linea-parcial td{background:var(--orange-bg)}
 .extra-flag{color:var(--orange);font-weight:700;font-size:9.5px;margin-left:6px;background:var(--yellow-bg);border:1px solid #f3d29b;padding:1px 6px;border-radius:3px}
 .vinculo-badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:4px;padding:2px 8px;font-size:10.5px;font-family:'IBM Plex Mono',monospace;font-weight:600;margin:3px 4px 0 0;cursor:default}
 .vinculo-list-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;margin-bottom:6px;background:var(--gray-50)}
@@ -613,11 +615,11 @@ function ocAccordionHTML(mes, o) {
   const detailRows = o.lineas.map(l => {
     const rec = (o.acta_por_codigo || {})[l.codigo];
     const cantRecibida = rec ? rec.cantidad : 0;
-    let check;
-    if (cantRecibida <= 0) check = '<span style="color:var(--gray-300);font-size:15px">\u25cb</span>';
-    else if (cantRecibida >= l.cantidad) check = '<span style="color:var(--green);font-size:15px" title="Recibido completo">\u2713</span>';
-    else check = `<span style="color:var(--orange);font-size:11px;font-weight:700" title="Recibido parcial">${cantRecibida}/${l.cantidad}</span>`;
-    return `<tr><td style="text-align:center;width:36px">${check}</td><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>`;
+    let claseFila = '';
+    let cantHTML = l.cantidad;
+    if (cantRecibida > 0 && cantRecibida >= l.cantidad) { claseFila = 'linea-recibida'; }
+    else if (cantRecibida > 0) { claseFila = 'linea-parcial'; cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`; }
+    return `<tr class="${claseFila}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
   }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
@@ -670,8 +672,8 @@ function ocAccordionHTML(mes, o) {
       ${facturasHTML}
       ${vinculosHTML}
       <table>
-        <thead><tr><th></th><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
-        <tbody>${detailRows || '<tr><td colspan="5" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
+        <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
+        <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
       </table>
     </div>
   </div>`;
