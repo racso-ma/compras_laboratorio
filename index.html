@@ -562,6 +562,10 @@ function calcularAvancePorOC(mes) {
     if (!porOC[oc].facturas) porOC[oc].facturas = [];
     const yaExiste = porOC[oc].facturas.some(f => f.factura === a.factura && f.fecha_acta === a.fecha_acta);
     if (!yaExiste) porOC[oc].facturas.push({ factura: a.factura, fecha_acta: a.fecha_acta, acta_num: a.acta_num });
+    if (!porOC[oc].acta_por_codigo) porOC[oc].acta_por_codigo = {};
+    if (!porOC[oc].acta_por_codigo[a.cod_articulo]) porOC[oc].acta_por_codigo[a.cod_articulo] = { cantidad: 0, total: 0 };
+    porOC[oc].acta_por_codigo[a.cod_articulo].cantidad += (Number(a.cantidad) || 0);
+    porOC[oc].acta_por_codigo[a.cod_articulo].total += a.total;
   });
   return Object.values(porOC).map(o => {
     let estado = 'pendiente';
@@ -606,9 +610,15 @@ function ocAccordionHTML(mes, o) {
   const badgeLabel = { completo: 'Completo', parcial: 'Parcial', pendiente: 'Pendiente', cerrada: 'Cerrada' };
   const key = mes + '|' + o.oc;
   const open = ocsAbiertas.has(key);
-  const detailRows = o.lineas.map(l => `
-    <tr><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>
-  `).join('');
+  const detailRows = o.lineas.map(l => {
+    const rec = (o.acta_por_codigo || {})[l.codigo];
+    const cantRecibida = rec ? rec.cantidad : 0;
+    let check;
+    if (cantRecibida <= 0) check = '<span style="color:var(--gray-300);font-size:15px">\u25cb</span>';
+    else if (cantRecibida >= l.cantidad) check = '<span style="color:var(--green);font-size:15px" title="Recibido completo">\u2713</span>';
+    else check = `<span style="color:var(--orange);font-size:11px;font-weight:700" title="Recibido parcial">${cantRecibida}/${l.cantidad}</span>`;
+    return `<tr><td style="text-align:center;width:36px">${check}</td><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${l.cantidad}</td><td>${fmtCLP(l.total)}</td></tr>`;
+  }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
     if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura} · ${f.fecha_acta}`, clase: 'badge-completo' };
@@ -660,8 +670,8 @@ function ocAccordionHTML(mes, o) {
       ${facturasHTML}
       ${vinculosHTML}
       <table>
-        <thead><tr><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
-        <tbody>${detailRows || '<tr><td colspan="4" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
+        <thead><tr><th></th><th>Código</th><th>Artículo</th><th>Cant.</th><th>Total</th></tr></thead>
+        <tbody>${detailRows || '<tr><td colspan="5" style="color:var(--text-dim)">Sin líneas de pedido registradas (solo hay acta)</td></tr>'}</tbody>
       </table>
     </div>
   </div>`;
