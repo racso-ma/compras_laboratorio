@@ -13,6 +13,7 @@
   --orange:#c85000; --orange-bg:#fef0e6;
   --red:#b91c1c; --red-bg:#fef2f2;
   --yellow:#b45309; --yellow-bg:#fffbea;
+  --violet:#6d28d9; --violet-bg:#f1ebfc;
   --gray-50:#f8fafc; --gray-100:#f1f5f9; --gray-200:#e2e8f0; --gray-300:#cbd5e1;
   --gray-400:#94a3b8; --gray-500:#64748b; --gray-600:#475569; --gray-700:#334155;
   --text:#1a2535; --text-muted:#475569; --text-dim:#94a3b8;
@@ -115,6 +116,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .oc-body td{padding:7px 16px;border-bottom:1px solid var(--gray-100)}
 .oc-body tr.linea-recibida td{background:var(--green-bg)}
 .oc-body tr.linea-parcial td{background:var(--orange-bg)}
+.oc-body tr.linea-formato td{background:var(--blue-light)}
 .extra-flag{color:var(--orange);font-weight:700;font-size:9.5px;margin-left:6px;background:var(--yellow-bg);border:1px solid #f3d29b;padding:1px 6px;border-radius:3px}
 .vinculo-badge{display:inline-flex;align-items:center;gap:5px;background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid);border-radius:4px;padding:2px 8px;font-size:10.5px;font-family:'IBM Plex Mono',monospace;font-weight:600;margin:3px 4px 0 0;cursor:default}
 .vinculo-list-item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius);font-size:12px;margin-bottom:6px;background:var(--gray-50)}
@@ -130,6 +132,7 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
 .badge-pendiente{background:var(--gray-100);color:var(--gray-500);border:1px solid var(--gray-200)}
 .badge-cerrada{background:var(--red-bg);color:var(--red);border:1px solid #f3b8b8}
 .badge-gd{background:var(--blue-light);color:var(--blue);border:1px solid var(--blue-mid)}
+.badge-tardio{background:var(--violet-bg);color:var(--violet);border:1px solid #d5bdf5}
 
 .toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1.5px solid var(--blue);border-radius:var(--radius);padding:12px 18px;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-md);z-index:999;transform:translateY(100px);opacity:0;transition:transform .25s,opacity .25s;color:var(--text)}
 .toast.show{transform:translateY(0);opacity:1}
@@ -203,6 +206,8 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
     <div class="big">📭</div>
     <div>No hay datos cargados todavía. Ve a la pestaña Admin para subir el primer pedido y las actas del mes.</div>
   </div>
+
+  <div id="tardias-container"></div>
 
   <div id="meses-container"></div>
 </div>
@@ -542,6 +547,13 @@ function vinculosDe(ocNum) {
 const MOTIVO_LABEL = { precio: 'Diferencia de precio', cantidad: 'Diferencia de cantidad', otro: 'Otro motivo' };
 
 /* ===================== CÁLCULO DE AVANCE POR OC ===================== */
+function mesDeFecha(fechaStr) {
+  // 'DD/MM/YYYY' -> 'YYYY-MM'
+  if (!fechaStr) return null;
+  const p = fechaStr.split('/');
+  if (p.length !== 3) return null;
+  return `${p[2]}-${p[1].padStart(2,'0')}`;
+}
 function calcularAvancePorOC(mes) {
   const m = DATA.meses[mes];
   if (!m) return [];
@@ -555,19 +567,27 @@ function calcularAvancePorOC(mes) {
     if (l.extra) porOC[oc].extra = true;
     if (l.fecha_pedido && (!porOC[oc].fecha_pedido || l.fecha_pedido < porOC[oc].fecha_pedido)) porOC[oc].fecha_pedido = l.fecha_pedido;
   });
-  // Las actas vienen de TODA la clínica (no solo Laboratorio) — solo sumamos las que
-  // correspondan a una OC que efectivamente está en el pedido de Laboratorio de este mes.
-  (m.actas || []).forEach(a => {
-    const oc = a.oc || '(sin OC)';
-    if (!porOC[oc]) return; // OC de otro servicio/área -> se ignora, no se muestra
-    porOC[oc].total_acta += a.total;
-    if (!porOC[oc].facturas) porOC[oc].facturas = [];
-    const yaExiste = porOC[oc].facturas.some(f => f.factura === a.factura && f.fecha_acta === a.fecha_acta);
-    if (!yaExiste) porOC[oc].facturas.push({ factura: a.factura, fecha_acta: a.fecha_acta, acta_num: a.acta_num });
-    if (!porOC[oc].acta_por_codigo) porOC[oc].acta_por_codigo = {};
-    if (!porOC[oc].acta_por_codigo[a.cod_articulo]) porOC[oc].acta_por_codigo[a.cod_articulo] = { cantidad: 0, total: 0 };
-    porOC[oc].acta_por_codigo[a.cod_articulo].cantidad += (Number(a.cantidad) || 0);
-    porOC[oc].acta_por_codigo[a.cod_articulo].total += a.total;
+  // Las actas se buscan en TODOS los meses cargados (no solo el mes de este pedido), porque
+  // un pedido de un mes puede recibir su acta recién el mes siguiente (o subsiguiente).
+  // Además vienen de TODA la clínica -> solo sumamos las que correspondan a una OC de este pedido.
+  Object.keys(DATA.meses).forEach(mesActa => {
+    (DATA.meses[mesActa].actas || []).forEach(a => {
+      const oc = a.oc || '(sin OC)';
+      if (!porOC[oc]) return; // OC de otro servicio/área -> se ignora, no se muestra
+      porOC[oc].total_acta += a.total;
+      if (!porOC[oc].facturas) porOC[oc].facturas = [];
+      const yaExiste = porOC[oc].facturas.some(f => f.factura === a.factura && f.fecha_acta === a.fecha_acta);
+      if (!yaExiste) porOC[oc].facturas.push({ factura: a.factura, fecha_acta: a.fecha_acta, acta_num: a.acta_num });
+      if (!porOC[oc].acta_por_codigo) porOC[oc].acta_por_codigo = {};
+      if (!porOC[oc].acta_por_codigo[a.cod_articulo]) porOC[oc].acta_por_codigo[a.cod_articulo] = { cantidad: 0, total: 0 };
+      porOC[oc].acta_por_codigo[a.cod_articulo].cantidad += (Number(a.cantidad) || 0);
+      porOC[oc].acta_por_codigo[a.cod_articulo].total += a.total;
+      const mesRealActa = mesDeFecha(a.fecha_acta) || mesActa;
+      if (mesRealActa !== mes) {
+        if (!porOC[oc].meses_acta_distintos) porOC[oc].meses_acta_distintos = new Set();
+        porOC[oc].meses_acta_distintos.add(mesRealActa);
+      }
+    });
   });
   return Object.values(porOC).map(o => {
     let estado = 'pendiente';
@@ -578,6 +598,8 @@ function calcularAvancePorOC(mes) {
     o.estado = estado;
     o.pct = o.total_pedido > 0 ? o.total_acta / o.total_pedido : (o.total_acta > 0 ? 1 : 0);
     o.tieneAjustes = o.lineas.some(l => l.ajustado);
+    o.recepcionTardia = !!(o.meses_acta_distintos && o.meses_acta_distintos.size > 0 && o.total_acta > 0);
+    o.mesesActaDistintos = o.meses_acta_distintos ? Array.from(o.meses_acta_distintos).sort() : [];
     return o;
   }).sort((a,b) => b.total_pedido - a.total_pedido);
 }
@@ -615,11 +637,33 @@ function ocAccordionHTML(mes, o) {
   const detailRows = o.lineas.map(l => {
     const rec = (o.acta_por_codigo || {})[l.codigo];
     const cantRecibida = rec ? rec.cantidad : 0;
+    const totalRecibido = rec ? rec.total : 0;
+    const totalPedidoLinea = l.total;
+    const precioPedidoUnit = l.precio || (l.cantidad ? l.total / l.cantidad : 0);
+    const precioRecibidoUnit = cantRecibida > 0 ? totalRecibido / cantRecibida : 0;
+    const tol = Math.max(1, precioPedidoUnit * 0.01);
+    const totalCalza = Math.abs(totalRecibido - totalPedidoLinea) <= 1;
+    const precioCalza = Math.abs(precioRecibidoUnit - precioPedidoUnit) <= tol;
     let claseFila = '';
     let cantHTML = l.cantidad;
-    if (cantRecibida > 0 && cantRecibida >= l.cantidad) { claseFila = 'linea-recibida'; }
-    else if (cantRecibida > 0) { claseFila = 'linea-parcial'; cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`; }
-    return `<tr class="${claseFila}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
+    let alertaHTML = '';
+    if (cantRecibida <= 0) {
+      // pendiente, sin clase
+    } else if (cantRecibida >= l.cantidad && precioCalza) {
+      claseFila = 'linea-recibida';
+    } else if (totalCalza) {
+      claseFila = 'linea-formato';
+      cantHTML = `${cantRecibida} recibidas (pedido ${l.cantidad})`;
+      alertaHTML = `<div class="ajuste-note" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid);display:block;margin:3px 0 0">🔁 Llegó en otro formato — mismo monto total (${fmtCLP(totalRecibido)})</div>`;
+    } else if (precioCalza && cantRecibida !== l.cantidad) {
+      claseFila = 'linea-parcial';
+      cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`;
+      alertaHTML = `<div class="ajuste-note" style="display:block;margin:3px 0 0">⚠ Cantidad no calza — verificar con proveedor (pedido ${l.cantidad}, llegó ${cantRecibida})</div>`;
+    } else {
+      claseFila = 'linea-parcial';
+      cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`;
+    }
+    return `<tr class="${claseFila}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}${alertaHTML}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
   }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
@@ -641,6 +685,10 @@ function ocAccordionHTML(mes, o) {
     <div style="padding:10px 16px 0;font-size:11.5px;color:var(--red)">
       <b>⛔ OC cerrada</b>${o.cierre.referencia ? ' · ref. '+o.cierre.referencia : ''}${o.cierre.fecha ? ' · '+o.cierre.fecha : ''}
     </div>` : '';
+  const tardiaHTML = o.recepcionTardia ? `
+    <div style="padding:10px 16px 0;font-size:11.5px;color:var(--violet)">
+      <b>📅 Recepción fuera de plazo</b> — pedido en ${mesLabel(mes)}, acta de ${o.mesesActaDistintos.map(mesLabel).join(', ')}
+    </div>` : '';
   const ajustesHTML = o.tieneAjustes ? `
     <div style="padding:10px 16px 0;font-size:11.5px;color:var(--orange)">
       <b>✏️ Pedido corregido</b> en ${o.lineas.filter(l=>l.ajustado).length} línea(s) tras regularización (ver detalle abajo)
@@ -655,7 +703,7 @@ function ocAccordionHTML(mes, o) {
   return `
   <div class="oc-item ${open?'open':''}" data-key="${key}">
     <div class="oc-header" data-key="${key}">
-      <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}${(comoNueva.length+comoAntigua.length) ? '<span class="extra-flag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">🔗</span>' : ''}</div>
+      <div><span class="oc-label">OC</span><span class="oc-code">${o.oc}</span>${o.extra ? '<span class="extra-flag">EXTRA</span>' : ''}${(comoNueva.length+comoAntigua.length) ? '<span class="extra-flag" style="background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)">🔗</span>' : ''}${o.recepcionTardia ? '<span class="extra-flag" style="background:var(--violet-bg);color:var(--violet);border-color:#d5bdf5">📅</span>' : ''}</div>
       <div><span class="oc-label">Proveedor</span>${o.proveedor || '\u2014'}</div>
       <div><span class="oc-label">Factura / guía</span>${facturasInlineHTML}</div>
       <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '\u2014'}</div>
@@ -668,6 +716,7 @@ function ocAccordionHTML(mes, o) {
     </div>
     <div class="oc-body">
       ${cierreHTML}
+      ${tardiaHTML}
       ${ajustesHTML}
       ${facturasHTML}
       ${vinculosHTML}
@@ -694,6 +743,45 @@ function categoriaAccordionHTML(mes, estado, label, dotClass, ocs) {
       <div class="oc-list">${lst.map(o => ocAccordionHTML(mes, o)).join('')}</div>
     </div>
   </div>`;
+}
+
+function renderTardiasSection() {
+  const cont = document.getElementById('tardias-container');
+  const meses = listaMeses();
+  let todas = [];
+  meses.forEach(mes => {
+    calcularAvancePorOC(mes).filter(o => o.recepcionTardia).forEach(o => todas.push({ mes, o }));
+  });
+  if (!todas.length) { cont.innerHTML = ''; return; }
+  const key = 'tardias';
+  const open = categoriasAbiertas.has(key);
+  const totalMonto = todas.reduce((s,x) => s + x.o.total_pedido, 0);
+  cont.innerHTML = `
+    <div class="mes-section">
+      <div class="mes-header ${open?'open':''}" data-mes="__tardias__" style="background:var(--violet)">
+        <div class="mes-title"><span class="chevron">▸</span> 📅 OC con recepción fuera de plazo</div>
+        <div class="mes-stats">
+          <span>${todas.length} OC</span>
+          <span>${fmtCLP(totalMonto)}</span>
+        </div>
+      </div>
+      <div class="mes-body ${open?'open':''}" data-mes-body="__tardias__">
+        <div class="oc-list">
+          ${todas.map(x => ocAccordionHTML(x.mes, x.o)).join('')}
+        </div>
+      </div>
+    </div>`;
+  cont.querySelector('.mes-header').addEventListener('click', () => {
+    if (categoriasAbiertas.has(key)) categoriasAbiertas.delete(key); else categoriasAbiertas.add(key);
+    renderPedidoMensual();
+  });
+  cont.querySelectorAll('.oc-header').forEach(h => {
+    h.addEventListener('click', () => {
+      const k = h.dataset.key;
+      if (ocsAbiertas.has(k)) ocsAbiertas.delete(k); else ocsAbiertas.add(k);
+      renderPedidoMensual();
+    });
+  });
 }
 
 function renderPedidoMensual() {
@@ -786,6 +874,8 @@ function renderPedidoMensual() {
       renderPedidoMensual();
     });
   });
+
+  renderTardiasSection();
 }
 
 /* ===================== EXPORT CSV HISTÓRICO ===================== */
