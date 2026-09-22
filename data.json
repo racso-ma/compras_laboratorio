@@ -944,11 +944,14 @@
           "codigo": "40207301",
           "articulo": "HS-CTNL CONTROL (LEVEL 3) 3 BOTELLAS (REF 105-031868-00)",
           "cantidad": 2,
-          "precio": 213999,
-          "total": 427998,
+          "precio": 227099,
+          "total": 454198,
           "oc": "11071452",
           "fecha_pedido": null,
-          "extra": false
+          "extra": false,
+          "ajustado": true,
+          "ajuste_motivo": "AJUSTE VALOR",
+          "ajuste_fecha": "2026-09-22"
         },
         {
           "rut": "79.568.850-1",
@@ -956,11 +959,14 @@
           "codigo": "40207299",
           "articulo": "HS-CTNL CONTROL (LEVEL 1) 3 BOTELLAS (REF 105-031870-00)",
           "cantidad": 2,
-          "precio": 213999,
-          "total": 427998,
+          "precio": 227099,
+          "total": 454198,
           "oc": "11071452",
           "fecha_pedido": null,
-          "extra": false
+          "extra": false,
+          "ajustado": true,
+          "ajuste_motivo": "AJUSTE VALOR",
+          "ajuste_fecha": "2026-09-22"
         },
         {
           "rut": "79.568.850-1",
@@ -968,11 +974,14 @@
           "codigo": "40207109",
           "articulo": "NT-PROBNP CONTROL (L) 3×0,5ML (REF 105-035649-00)",
           "cantidad": 2,
-          "precio": 240999,
-          "total": 481998,
+          "precio": 256405,
+          "total": 512810,
           "oc": "11071452",
           "fecha_pedido": null,
-          "extra": false
+          "extra": false,
+          "ajustado": true,
+          "ajuste_motivo": "AJUSTE VALOR",
+          "ajuste_fecha": "2026-09-22"
         },
         {
           "rut": "79.568.850-1",
@@ -980,11 +989,14 @@
           "codigo": "40207110",
           "articulo": "NT-PROBNP CONTROL (H) 3×0,5ML (REF 105-035738-00)",
           "cantidad": 2,
-          "precio": 240999,
-          "total": 481998,
+          "precio": 256405,
+          "total": 512810,
           "oc": "11071452",
           "fecha_pedido": null,
-          "extra": false
+          "extra": false,
+          "ajustado": true,
+          "ajuste_motivo": "AJUSTE VALOR",
+          "ajuste_fecha": "2026-09-22"
         },
         {
           "rut": "79.568.850-1",
@@ -10393,7 +10405,7 @@
           "total": 94038
         }
       ],
-      "actualizado": "2026-09-21T13:10:04.793Z"
+      "actualizado": "2026-09-22T12:20:31.811Z"
     }
   },
   "guias_despacho": {
@@ -10401,5 +10413,7 @@
       "numero": "65173",
       "fecha_registro": "2026-09-17T12:07:34.853Z"
     }
-  }
+  },
+  "oc_cerradas": {},
+  "vinculos": []
 }
