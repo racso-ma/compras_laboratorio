@@ -951,7 +951,9 @@
           "extra": false,
           "ajustado": true,
           "ajuste_motivo": "AJUSTE VALOR",
-          "ajuste_fecha": "2026-09-22"
+          "ajuste_fecha": "2026-09-22",
+          "reemplazada": true,
+          "reemplazada_por": "11071644"
         },
         {
           "rut": "79.568.850-1",
@@ -966,7 +968,9 @@
           "extra": false,
           "ajustado": true,
           "ajuste_motivo": "AJUSTE VALOR",
-          "ajuste_fecha": "2026-09-22"
+          "ajuste_fecha": "2026-09-22",
+          "reemplazada": true,
+          "reemplazada_por": "11071644"
         },
         {
           "rut": "79.568.850-1",
@@ -981,7 +985,9 @@
           "extra": false,
           "ajustado": true,
           "ajuste_motivo": "AJUSTE VALOR",
-          "ajuste_fecha": "2026-09-22"
+          "ajuste_fecha": "2026-09-22",
+          "reemplazada": true,
+          "reemplazada_por": "11071644"
         },
         {
           "rut": "79.568.850-1",
@@ -996,7 +1002,9 @@
           "extra": false,
           "ajustado": true,
           "ajuste_motivo": "AJUSTE VALOR",
-          "ajuste_fecha": "2026-09-22"
+          "ajuste_fecha": "2026-09-22",
+          "reemplazada": true,
+          "reemplazada_por": "11071644"
         },
         {
           "rut": "79.568.850-1",
@@ -1608,6 +1616,54 @@
           "total": 466860,
           "oc": "11071620",
           "fecha_pedido": "2026-09-15",
+          "extra": true
+        },
+        {
+          "rut": "",
+          "proveedor": "VALTEK",
+          "codigo": "40207301",
+          "articulo": "HS-CTNL CONTROL (LEVEL 3) 3 BOTELLAS (REF 105-031868-00)",
+          "cantidad": 2,
+          "precio": 227099,
+          "total": 454198,
+          "oc": "11071644",
+          "fecha_pedido": "2026-09-22",
+          "extra": true
+        },
+        {
+          "rut": "",
+          "proveedor": "VALTEK",
+          "codigo": "40207299",
+          "articulo": "HS-CTNL CONTROL (LEVEL 1) 3 BOTELLAS (REF 105-031870-00)",
+          "cantidad": 2,
+          "precio": 227099,
+          "total": 454198,
+          "oc": "11071644",
+          "fecha_pedido": "2026-09-22",
+          "extra": true
+        },
+        {
+          "rut": "",
+          "proveedor": "VALTEK",
+          "codigo": "40207109",
+          "articulo": "NT-PROBNP CONTROL (L) 3×0,5ML (REF 105-035649-00)",
+          "cantidad": 2,
+          "precio": 256405,
+          "total": 512810,
+          "oc": "11071644",
+          "fecha_pedido": "2026-09-22",
+          "extra": true
+        },
+        {
+          "rut": "",
+          "proveedor": "VALTEK",
+          "codigo": "40207110",
+          "articulo": "NT-PROBNP CONTROL (H) 3×0,5ML (REF 105-035738-00)",
+          "cantidad": 2,
+          "precio": 256405,
+          "total": 512810,
+          "oc": "11071644",
+          "fecha_pedido": "2026-09-22",
           "extra": true
         }
       ],
@@ -10405,7 +10461,7 @@
           "total": 94038
         }
       ],
-      "actualizado": "2026-09-22T12:21:48.360Z"
+      "actualizado": "2026-09-22T12:43:06.563Z"
     }
   },
   "guias_despacho": {
@@ -10415,5 +10471,14 @@
     }
   },
   "oc_cerradas": {},
-  "vinculos": []
+  "vinculos": [
+    {
+      "oc_nueva": "11071644",
+      "oc_antigua": "11071452",
+      "motivo": "precio",
+      "diferencia": null,
+      "nota": "Regularización: AJUSTE VALOR",
+      "fecha_registro": "2026-09-22T12:43:06.562Z"
+    }
+  ]
 }
