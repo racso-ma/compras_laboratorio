@@ -663,7 +663,9 @@ function ocAccordionHTML(mes, o) {
       claseFila = 'linea-parcial';
       cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`;
     }
-    return `<tr class="${claseFila}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}${alertaHTML}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
+    const filaClaseFinal = l.reemplazada ? 'linea-formato' : claseFila;
+    const reemplazadaNote = l.reemplazada ? `<div class="ajuste-note" style="display:block;margin:3px 0 0">↪️ Reemplazada por OC ${l.reemplazada_por} (regularización) — este pedido original ya no aplica</div>` : '';
+    return `<tr class="${filaClaseFinal}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}${alertaHTML}${reemplazadaNote}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
   }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
@@ -1066,27 +1068,58 @@ document.getElementById('btn-upload-regularizacion').addEventListener('click', a
   try {
     statusEl.textContent = 'Leyendo archivo…'; statusEl.className = 'status-line';
     const filas = await parseRegularizacionFile(fileInput.files[0]);
-    let nAjustes = 0, nCierres = 0, nVinculos = 0, nOmitidas = 0;
+    let nAjustes = 0, nCierres = 0, nVinculos = 0, nNuevasLineas = 0, nOmitidas = 0;
     if (!DATA.oc_cerradas) DATA.oc_cerradas = {};
     if (!DATA.vinculos) DATA.vinculos = [];
+    const mesDestino = document.getElementById('admin-mes').value.trim() || mesActual();
+    const motivoAVinculo = (motivoUp) => motivoUp.includes('VALOR') ? 'precio' : motivoUp.includes('CANTIDAD') ? 'cantidad' : 'otro';
 
     filas.forEach(f => {
       const motivoUp = (f.motivo || '').toUpperCase();
+      const existeOC = Object.keys(DATA.meses).some(mes => (DATA.meses[mes].pedido||[]).some(l => l.oc === f.oc));
+
+      // Caso 1: la fila trae una OC nueva -> siempre se vincula, sin importar el motivo.
+      if (f.oc_nueva) {
+        if (!existeOC) { nOmitidas++; return; }
+        const yaExiste = DATA.vinculos.some(v => v.oc_nueva === f.oc_nueva && v.oc_antigua === f.oc);
+        if (!yaExiste) {
+          DATA.vinculos.push({ oc_nueva: f.oc_nueva, oc_antigua: f.oc, motivo: motivoAVinculo(motivoUp), diferencia: null, nota: `Regularización: ${f.motivo}`, fecha_registro: new Date().toISOString() });
+          nVinculos++;
+        }
+        // Marca la línea antigua como reemplazada (no se edita su precio/cantidad original) y crea la línea nueva bajo la OC nueva.
+        const encontrada = buscarLineaPedido(f.oc, f.codigo);
+        if (encontrada) {
+          encontrada.linea.reemplazada = true;
+          encontrada.linea.reemplazada_por = f.oc_nueva;
+        }
+        ensureMes(mesDestino);
+        const yaCreada = (DATA.meses[mesDestino].pedido || []).some(l => l.oc === f.oc_nueva && l.codigo === f.codigo);
+        if (!yaCreada) {
+          DATA.meses[mesDestino].pedido.push({
+            rut: '', proveedor: f.proveedor, codigo: f.codigo, articulo: f.descripcion,
+            cantidad: f.cantidad, precio: f.precio, total: f.cantidad * f.precio,
+            oc: f.oc_nueva, fecha_pedido: new Date().toISOString().slice(0,10), extra: true
+          });
+          DATA.meses[mesDestino].actualizado = new Date().toISOString();
+          nNuevasLineas++;
+        }
+        if (motivoUp.includes('CERRADA')) {
+          DATA.oc_cerradas[f.oc] = { fecha: new Date().toISOString().slice(0,10), referencia: f.referencia || null };
+          nCierres++;
+        }
+        return;
+      }
+
+      // Caso 2: OC CERRADA sin OC de reemplazo indicada todavía.
       if (motivoUp.includes('CERRADA')) {
-        // Cierre de OC — se aplica sin necesidad de que exista línea de pedido para ese código puntual,
-        // basta con que la OC exista en algún pedido cargado.
-        const existeOC = Object.keys(DATA.meses).some(mes => (DATA.meses[mes].pedido||[]).some(l => l.oc === f.oc));
         if (!existeOC) { nOmitidas++; return; }
         DATA.oc_cerradas[f.oc] = { fecha: new Date().toISOString().slice(0,10), referencia: f.referencia || null };
         nCierres++;
-        if (f.oc_nueva) {
-          const yaExiste = DATA.vinculos.some(v => v.oc_nueva === f.oc_nueva && v.oc_antigua === f.oc);
-          if (!yaExiste) {
-            DATA.vinculos.push({ oc_nueva: f.oc_nueva, oc_antigua: f.oc, motivo: 'otro', diferencia: null, nota: 'OC cerrada y reemplazada (regularización)', fecha_registro: new Date().toISOString() });
-            nVinculos++;
-          }
-        }
-      } else if (motivoUp.includes('AJUSTE')) {
+        return;
+      }
+
+      // Caso 3: ajuste de precio/cantidad en la MISMA OC (sin OC nueva) -> corrige la línea in situ.
+      if (motivoUp.includes('AJUSTE')) {
         const encontrada = buscarLineaPedido(f.oc, f.codigo);
         if (!encontrada) { nOmitidas++; return; }
         const l = encontrada.linea;
@@ -1098,14 +1131,15 @@ document.getElementById('btn-upload-regularizacion').addEventListener('click', a
         l.ajuste_fecha = new Date().toISOString().slice(0,10);
         DATA.meses[encontrada.mes].actualizado = new Date().toISOString();
         nAjustes++;
-      } else {
-        nOmitidas++;
+        return;
       }
+
+      nOmitidas++;
     });
 
     statusEl.textContent = 'Guardando en GitHub…';
     await saveData();
-    statusEl.textContent = `${nAjustes} línea(s) de pedido ajustadas, ${nCierres} OC cerradas (${nVinculos} con OC de reemplazo vinculada), ${nOmitidas} fila(s) omitidas (no pertenecen a Laboratorio o motivo no reconocido).`;
+    statusEl.textContent = `${nAjustes} línea(s) ajustadas en su OC original, ${nVinculos} vínculo(s) OC nueva↔antigua creados (${nNuevasLineas} línea(s) nuevas agregadas bajo la OC nueva en ${mesDestino}), ${nCierres} OC marcadas cerradas, ${nOmitidas} fila(s) omitidas (no pertenecen a Laboratorio).`;
     statusEl.className = 'status-line ok';
     renderVinculosList();
     renderPedidoMensual();
