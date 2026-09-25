@@ -669,10 +669,11 @@ function ocAccordionHTML(mes, o) {
   }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
-    if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura} · ${f.fecha_acta}`, clase: 'badge-completo' };
+    const actaTxt = f.acta_num ? ` · Acta ${f.acta_num}` : '';
+    if (f.factura && f.factura !== '0') return { texto: `Factura ${f.factura}${actaTxt} · ${f.fecha_acta}`, clase: 'badge-completo' };
     const gd = (DATA.guias_despacho || {})[f.acta_num];
-    if (gd) return { texto: `GD ${gd.numero} · ${f.fecha_acta}`, clase: 'badge-gd' };
-    return { texto: `⚠ Falta N° de guía · ${f.fecha_acta}`, clase: 'badge-parcial' };
+    if (gd) return { texto: `GD ${gd.numero}${actaTxt} · ${f.fecha_acta}`, clase: 'badge-gd' };
+    return { texto: `⚠ Falta N° de guía${actaTxt} · ${f.fecha_acta}`, clase: 'badge-parcial' };
   };
   const facturasInlineHTML = facturas.length
     ? facturas.map(f => { const l = facturaLabel(f); return `<span class="badge ${l.clase}" style="margin:3px 3px 0 0">${l.texto}</span>`; }).join('')
@@ -710,8 +711,8 @@ function ocAccordionHTML(mes, o) {
       <div><span class="oc-label">Factura / guía</span>${facturasInlineHTML}</div>
       <div><span class="oc-label">Fecha pedido</span>${o.fecha_pedido || '\u2014'}</div>
       <div><span class="oc-label">Líneas</span>${o.lineas.length}</div>
-      <div><span class="oc-label">Pedido</span>${fmtCLP(o.total_pedido)}</div>
-      <div><span class="oc-label">Acta</span>${fmtCLP(o.total_acta)}</div>
+      <div><span class="oc-label">Pedido</span>${fmtCLP(o.total_acta)} / ${fmtCLP(o.total_pedido)}</div>
+      <div><span class="oc-label">N° Acta</span>${(o.facturas||[]).length ? [...new Set((o.facturas||[]).map(f=>f.acta_num))].join(', ') : '\u2014'}</div>
       <div><span class="oc-label">Avance</span>${fmtPct(o.pct)}</div>
       <div><span class="badge badge-${o.estado}">${badgeLabel[o.estado]}</span></div>
       <div class="oc-chevron">\u25b8</div>
