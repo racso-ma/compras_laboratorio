@@ -264,6 +264,17 @@ nav::-webkit-scrollbar-thumb{background:var(--border)}
     </div>
 
     <div class="admin-box card" style="margin-bottom:16px">
+      <h3>Gestionar líneas de pedido — mes seleccionado arriba</h3>
+      <div class="hint">Edita o elimina líneas ya cargadas (por ejemplo si un archivo se leyó mal). Los cambios se guardan al tocar fuera del campo.</div>
+      <div style="max-height:420px;overflow:auto;border:1px solid var(--border);border-radius:var(--radius)">
+        <table class="rt" id="gestion-pedido-table" style="font-size:12px">
+          <thead><tr><th>Código</th><th>Artículo</th><th>OC</th><th>Cant.</th><th>Precio</th><th>Total</th><th>Extra</th><th></th></tr></thead>
+          <tbody id="gestion-pedido-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-box card" style="margin-bottom:16px">
       <h3>Guías de despacho pendientes de registrar</h3>
       <div class="hint">El archivo de actas no trae el número real de guía cuando aún no hay factura (aparece como "FACTURA: 0"). Complétalo aquí manualmente para que quede identificado en vez de mostrar un genérico.</div>
       <div id="gd-pendientes-list"></div>
@@ -418,19 +429,34 @@ async function parsePedidoFile(file) {
   const sheetName = wb.SheetNames.find(n => n.trim().toUpperCase().startsWith('PEDIDO')) || wb.SheetNames[0];
   const sheet = wb.Sheets[sheetName];
   const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null });
+  if (!rows.length) return [];
+  // Lee por NOMBRE de columna (no por posición) — algunos archivos traen o no 'Total',
+  // y a veces las columnas vienen en otro orden.
+  const headers = rows[0].map(h => (h == null ? '' : String(h)).trim().toUpperCase());
+  const idx = (names) => headers.findIndex(h => names.some(n => h === n || h.includes(n)));
+  const iRut = idx(['RUT']);
+  const iProv = idx(['PROVEEDOR']);
+  const iCod = idx(['COD.ARTÍCULO','COD.ARTICULO','CODIGO','CÓDIGO']);
+  const iArt = idx(['ARTÍCULO','ARTICULO','DESCRIPCION','DESCRIPCIÓN']);
+  let iCant = idx(['CANTIDAD']);
+  const iPrecio = idx(['PRECIO']);
+  const iTotal = idx(['TOTAL']);
+  const iOC = idx(['OC']);
+  if (iCant < 0 && headers.length > 4 && ![iRut,iProv,iCod,iArt,iPrecio,iTotal,iOC].includes(4)) iCant = 4; // algunos archivos traen esta columna sin texto de encabezado
   const out = [];
   for (let i = 1; i < rows.length; i++) {
     const r = rows[i];
-    if (!r || r[2] == null || r[2] === '') continue;
+    if (!r || iCod < 0 || r[iCod] == null || r[iCod] === '') continue;
+    const cantidad = iCant >= 0 ? (Number(r[iCant]) || 0) : 0;
+    const precio = iPrecio >= 0 ? (Number(r[iPrecio]) || 0) : 0;
+    const total = iTotal >= 0 ? (Number(r[iTotal]) || 0) : cantidad * precio;
     out.push({
-      rut: r[0] != null ? String(r[0]) : '',
-      proveedor: r[1] != null ? String(r[1]) : '',
-      codigo: String(r[2]),
-      articulo: r[3] != null ? String(r[3]) : '',
-      cantidad: Number(r[4]) || 0,
-      precio: Number(r[5]) || 0,
-      total: Number(r[6]) || 0,
-      oc: r[7] != null ? String(r[7]) : ''
+      rut: iRut >= 0 && r[iRut] != null ? String(r[iRut]) : '',
+      proveedor: iProv >= 0 && r[iProv] != null ? String(r[iProv]) : '',
+      codigo: String(r[iCod]),
+      articulo: iArt >= 0 && r[iArt] != null ? String(r[iArt]) : '',
+      cantidad, precio, total,
+      oc: iOC >= 0 && r[iOC] != null ? String(r[iOC]) : ''
     });
   }
   return out;
@@ -948,11 +974,56 @@ function renderAdminResumenMes() {
   const m = DATA.meses[mes];
   if (!m || (m.pedido.length === 0 && m.actas.length === 0)) {
     el.innerHTML = `Sin datos cargados para <b>${mes}</b> aún.`;
-    return;
+  } else {
+    el.innerHTML = `<b>${mes}</b>: ${m.pedido.length} líneas de pedido, ${m.actas.length} líneas de acta. Última actualización: ${m.actualizado ? new Date(m.actualizado).toLocaleString('es-CL') : '—'}`;
   }
-  el.innerHTML = `<b>${mes}</b>: ${m.pedido.length} líneas de pedido, ${m.actas.length} líneas de acta. Última actualización: ${m.actualizado ? new Date(m.actualizado).toLocaleString('es-CL') : '—'}`;
+  renderGestionPedido();
 }
 document.getElementById('admin-mes').addEventListener('change', renderAdminResumenMes);
+
+/* ===================== ADMIN: GESTIONAR LÍNEAS DE PEDIDO ===================== */
+function renderGestionPedido() {
+  const mes = document.getElementById('admin-mes').value.trim();
+  const tbody = document.getElementById('gestion-pedido-tbody');
+  if (!tbody) return;
+  const m = DATA.meses[mes];
+  const lineas = m ? (m.pedido || []) : [];
+  if (!lineas.length) { tbody.innerHTML = `<tr><td colspan="8" style="color:var(--text-dim)">Sin líneas de pedido cargadas para ${mes || 'este mes'}.</td></tr>`; return; }
+  tbody.innerHTML = lineas.map((l, idx) => `
+    <tr>
+      <td class="td-code">${l.codigo}</td>
+      <td><input type="text" value="${(l.articulo||'').replace(/"/g,'&quot;')}" data-idx="${idx}" data-field="articulo" class="gestion-input" style="width:220px"></td>
+      <td><input type="text" value="${l.oc||''}" data-idx="${idx}" data-field="oc" class="gestion-input" style="width:100px"></td>
+      <td><input type="number" value="${l.cantidad||0}" data-idx="${idx}" data-field="cantidad" class="gestion-input" style="width:70px"></td>
+      <td><input type="number" value="${l.precio||0}" data-idx="${idx}" data-field="precio" class="gestion-input" style="width:90px"></td>
+      <td><input type="number" value="${l.total||0}" data-idx="${idx}" data-field="total" class="gestion-input" style="width:100px"></td>
+      <td style="text-align:center">${l.extra ? '✓' : ''}</td>
+      <td><span class="vinculo-del" data-idx="${idx}" title="Eliminar línea">✕</span></td>
+    </tr>`).join('');
+  tbody.querySelectorAll('.gestion-input').forEach(inp => {
+    inp.addEventListener('change', async () => {
+      const idx = Number(inp.dataset.idx);
+      const field = inp.dataset.field;
+      const linea = DATA.meses[mes].pedido[idx];
+      linea[field] = (field === 'cantidad' || field === 'precio' || field === 'total') ? Number(inp.value) || 0 : inp.value;
+      if (field === 'cantidad' || field === 'precio') linea.total = (linea.cantidad || 0) * (linea.precio || 0);
+      DATA.meses[mes].actualizado = new Date().toISOString();
+      try { await saveData(); renderGestionPedido(); renderPedidoMensual(); } catch(e) {}
+    });
+  });
+  tbody.querySelectorAll('.vinculo-del').forEach(el => {
+    el.addEventListener('click', async () => {
+      if (!confirm('¿Eliminar esta línea de pedido? No se puede deshacer.')) return;
+      const idx = Number(el.dataset.idx);
+      DATA.meses[mes].pedido.splice(idx, 1);
+      DATA.meses[mes].actualizado = new Date().toISOString();
+      await saveData();
+      renderGestionPedido();
+      renderAdminResumenMes();
+      renderPedidoMensual();
+    });
+  });
+}
 
 /* ===================== ADMIN: CARGA DE PEDIDO ===================== */
 document.getElementById('btn-upload-pedido').addEventListener('click', async () => {
