@@ -135,18 +135,6 @@
           "extra": false
         },
         {
-          "rut": "78.027.120-5",
-          "proveedor": "DISTRIBUIDORA DE PRODUCTOS DE LABORATORIO DIPROLAB LIMITADA",
-          "codigo": "3555351",
-          "articulo": "CEPILLOS NASOFARINGEOS (50u)",
-          "cantidad": 150,
-          "precio": 490,
-          "total": 73500,
-          "oc": "ACTIVAR CODIGO",
-          "fecha_pedido": null,
-          "extra": false
-        },
-        {
           "rut": "78.027.120-6",
           "proveedor": "DISTRIBUIDORA DE PRODUCTOS DE LABORATORIO DIPROLAB LIMITADA",
           "codigo": "3551041",
@@ -11145,7 +11133,7 @@
           "total": 231501
         }
       ],
-      "actualizado": "2026-09-30T16:12:00.137Z"
+      "actualizado": "2026-09-30T16:13:25.895Z"
     }
   },
   "guias_despacho": {
