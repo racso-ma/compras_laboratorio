@@ -1665,6 +1665,18 @@
           "oc": "11071644",
           "fecha_pedido": "2026-09-22",
           "extra": true
+        },
+        {
+          "rut": "79.568.850-1",
+          "proveedor": "VALTEK S.A.",
+          "codigo": "3555361",
+          "articulo": "FERRITINA 2x50 test (105-004220-00)",
+          "cantidad": 1,
+          "precio": 108400,
+          "total": 11071790,
+          "oc": "",
+          "fecha_pedido": "2026-09-29",
+          "extra": true
         }
       ],
       "actas": [
@@ -11133,7 +11145,7 @@
           "total": 231501
         }
       ],
-      "actualizado": "2026-09-24T14:22:16.109Z"
+      "actualizado": "2026-09-30T15:59:51.813Z"
     }
   },
   "guias_despacho": {
