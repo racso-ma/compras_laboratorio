@@ -433,11 +433,18 @@ async function parsePedidoFile(file) {
   // Lee por NOMBRE de columna (no por posición) — algunos archivos traen o no 'Total',
   // y a veces las columnas vienen en otro orden.
   const headers = rows[0].map(h => (h == null ? '' : String(h)).trim().toUpperCase());
-  const idx = (names) => headers.findIndex(h => names.some(n => h === n || h.includes(n)));
+  // Primero busca coincidencia EXACTA (evita que "COD.ARTÍCULO" matchee la búsqueda de "ARTÍCULO"
+  // por el .includes()); solo si no hay match exacto cae a substring. `exclude` evita reusar una
+  // columna ya asignada a otro campo (p.ej. Código).
+  const idx = (names, exclude = []) => {
+    let i = headers.findIndex((h, hi) => !exclude.includes(hi) && names.includes(h));
+    if (i >= 0) return i;
+    return headers.findIndex((h, hi) => !exclude.includes(hi) && names.some(n => h.includes(n)));
+  };
   const iRut = idx(['RUT']);
   const iProv = idx(['PROVEEDOR']);
   const iCod = idx(['COD.ARTÍCULO','COD.ARTICULO','CODIGO','CÓDIGO']);
-  const iArt = idx(['ARTÍCULO','ARTICULO','DESCRIPCION','DESCRIPCIÓN']);
+  const iArt = idx(['ARTÍCULO','ARTICULO','DESCRIPCION','DESCRIPCIÓN'], [iCod]);
   let iCant = idx(['CANTIDAD']);
   const iPrecio = idx(['PRECIO']);
   const iTotal = idx(['TOTAL']);
