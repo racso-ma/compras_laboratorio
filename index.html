@@ -1073,11 +1073,24 @@ document.getElementById('btn-upload-actas').addEventListener('click', async () =
     statusEl.textContent = 'Leyendo archivo de actas…'; statusEl.className = 'status-line';
     const actas = await parseActasFile(fileInput.files[0]);
     const m = ensureMes(mes);
-    m.actas = actas;
+    // ACUMULA en vez de reemplazar: las actas ya guardadas se conservan. Si una acta del archivo
+    // ya existía (mismo N° de acta, en cualquier mes), se actualiza con la versión nueva (p.ej. si
+    // cambió la factura) y no se duplica.
+    const numsNuevos = new Set(actas.map(a => a.acta_num));
+    const numsPrevios = new Set();
+    Object.keys(DATA.meses).forEach(k => {
+      const mm = DATA.meses[k];
+      mm.actas = (mm.actas || []).filter(a => {
+        if (numsNuevos.has(a.acta_num)) { numsPrevios.add(a.acta_num); return false; }
+        return true;
+      });
+    });
+    m.actas = (m.actas || []).concat(actas);
     m.actualizado = new Date().toISOString();
     statusEl.textContent = 'Guardando en GitHub…';
     await saveData();
-    statusEl.textContent = `${actas.length} líneas de acta cargadas para ${mes} (reemplazó el set anterior).`;
+    const nuevas = [...numsNuevos].filter(n => !numsPrevios.has(n)).length;
+    statusEl.textContent = `Archivo con ${numsNuevos.size} actas: ${nuevas} nuevas, ${numsPrevios.size} ya existían (actualizadas). Las demás actas guardadas se conservaron.`;
     statusEl.className = 'status-line ok';
     mesesAbiertos.add(mes);
     renderAdminResumenMes();
