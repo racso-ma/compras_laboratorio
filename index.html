@@ -612,7 +612,7 @@ function calcularAvancePorOC(mes) {
       const yaExiste = porOC[oc].facturas.some(f => f.factura === a.factura && f.fecha_acta === a.fecha_acta);
       if (!yaExiste) porOC[oc].facturas.push({ factura: a.factura, fecha_acta: a.fecha_acta, acta_num: a.acta_num });
       if (!porOC[oc].acta_por_codigo) porOC[oc].acta_por_codigo = {};
-      if (!porOC[oc].acta_por_codigo[a.cod_articulo]) porOC[oc].acta_por_codigo[a.cod_articulo] = { cantidad: 0, total: 0 };
+      if (!porOC[oc].acta_por_codigo[a.cod_articulo]) porOC[oc].acta_por_codigo[a.cod_articulo] = { cantidad: 0, total: 0, nombre: a.nom_articulo || '' };
       porOC[oc].acta_por_codigo[a.cod_articulo].cantidad += (Number(a.cantidad) || 0);
       porOC[oc].acta_por_codigo[a.cod_articulo].total += a.total;
       const mesRealActa = mesDeFecha(a.fecha_acta) || mesActa;
@@ -696,9 +696,11 @@ function ocAccordionHTML(mes, o) {
       claseFila = 'linea-parcial';
       cantHTML = `<b style="color:var(--orange)">${cantRecibida}</b> / ${l.cantidad} recibidas`;
     }
+    // Si el pedido trae el código como nombre (o vacío), usa el nombre que viene en el acta
+    const nombreArt = (l.articulo && String(l.articulo).trim() !== String(l.codigo).trim()) ? l.articulo : ((rec && rec.nombre) || l.articulo);
     const filaClaseFinal = l.reemplazada ? 'linea-formato' : claseFila;
     const reemplazadaNote = l.reemplazada ? `<div class="ajuste-note" style="display:block;margin:3px 0 0">↪️ Reemplazada por OC ${l.reemplazada_por} (regularización) — este pedido original ya no aplica</div>` : '';
-    return `<tr class="${filaClaseFinal}"><td class="td-code">${l.codigo}</td><td>${l.articulo}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}${alertaHTML}${reemplazadaNote}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
+    return `<tr class="${filaClaseFinal}"><td class="td-code">${l.codigo}</td><td>${nombreArt}${l.ajustado ? '<span class="ajuste-note">ajustado \u00b7 '+(l.ajuste_motivo||'')+'</span>' : ''}${alertaHTML}${reemplazadaNote}</td><td>${cantHTML}</td><td>${fmtCLP(l.total)}</td></tr>`;
   }).join('');
   const facturas = o.facturas || [];
   const facturaLabel = f => {
