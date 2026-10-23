@@ -11315,7 +11315,9 @@
           "total": 10200,
           "oc": "11071842",
           "fecha_pedido": "2026-10-05",
-          "extra": false
+          "extra": false,
+          "reemplazada": true,
+          "reemplazada_por": "11072088"
         },
         {
           "rut": "76.096.232-5",
@@ -12456,6 +12458,18 @@
           "oc": "11071849",
           "fecha_pedido": "2026-10-05",
           "extra": false
+        },
+        {
+          "rut": "",
+          "proveedor": "COMERCIALIZADORA DE PRODUCTOS PARA LABORATORIOS E INDUSTRIA LIMITADA (INMUNODIAGNOSTICO)",
+          "codigo": "3401090",
+          "articulo": "TORULA NASOFARINGEA",
+          "cantidad": 200,
+          "precio": 560,
+          "total": 112000,
+          "oc": "11072088",
+          "fecha_pedido": "2026-10-23",
+          "extra": true
         }
       ],
       "actas": [
@@ -23450,7 +23464,7 @@
           "total": 112000
         }
       ],
-      "actualizado": "2026-10-23T19:17:31.037Z"
+      "actualizado": "2026-10-23T19:17:34.246Z"
     }
   },
   "guias_despacho": {
@@ -23480,6 +23494,14 @@
       "diferencia": null,
       "nota": "Regularización: AJUSTE VALOR",
       "fecha_registro": "2026-09-22T12:43:06.562Z"
+    },
+    {
+      "oc_nueva": "11072088",
+      "oc_antigua": "11071842",
+      "motivo": "precio",
+      "diferencia": null,
+      "nota": "Regularización: ajuste valor",
+      "fecha_registro": "2026-10-23T19:17:34.246Z"
     }
   ]
 }
